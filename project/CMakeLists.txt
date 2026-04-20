@@ -8,9 +8,14 @@ qt_standard_project_setup()
 qt_add_executable(project
     WIN32 MACOSX_BUNDLE
     main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+
+
+
+    loginpage.h loginpage.cpp loginpage.ui
+    mainWindow.h mainWindow.cpp
+    mainpage.h mainpage.cpp mainpage.ui
+    resources.qrc
+
 )
 
 target_link_libraries(project

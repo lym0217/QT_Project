@@ -2,12 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
-QT_END_NAMESPACE
+#include <QStackedWidget>
+#include "loginpage.h"
+#include "mainpage.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +15,8 @@ public:
     ~MainWindow() override;
 
 private:
-    Ui::MainWindow *ui;
+    QStackedWidget *stack;
+    LoginPage *loginPage;
+    MainPage *mainPage;
 };
 #endif // MAINWINDOW_H
