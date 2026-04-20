@@ -37,15 +37,13 @@ private slots:
 private:
     Ui::Bank_Manager *ui;
     AccountManager accountManager;
-
-    QString formatMoney(int amount);        // 금액 ,로 표시해주기
-    // 금액? 잔고 업데이트 함수
-    void updateAccountTable();
-    void addTransaction(QString type, int amount, QString target ="");
-    void updateHistoryTable();
-
-    //???????????
-    void refreshUI();                // ← 추가 (두 업데이트 함수 묶기)
+    
+    // UI표시 유용하게
+    QString formatMoney(int amount);        // 금액에 000,000로 표시해주기
+    void updateAccountTable();              // bank_table 계좌목록 갱신     
+    void updateHistoryTable();              // 거래내역 갱신
+    void refreshUI();                       // 위 두 함수 + account_label 한번에 갱신
+                                            // 입금, 출금, 송금을 한번에 업데이트 
 };
 
 
