@@ -15,6 +15,10 @@ qt_add_executable(project
     mainWindow.h mainWindow.cpp
     mainpage.h mainpage.cpp mainpage.ui
     resources.qrc
+    signup.h signup.cpp signup.ui
+    signupmanager.h signupmanager.cpp
+
+
 
 )
 

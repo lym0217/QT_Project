@@ -23,6 +23,8 @@ private slots:
 
     void on_pw_checkBox_checkStateChanged(const Qt::CheckState &arg1);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::LoginPage *ui;
 };
