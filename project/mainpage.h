@@ -2,6 +2,7 @@
 #define MAINPAGE_H
 
 #include <QWidget>
+#include "account_manager.h"
 
 namespace Ui {
 class MainPage;
@@ -28,6 +29,8 @@ private slots:
 
 private:
     Ui::MainPage *ui;
+    // AccountManager manager변수 선언
+    AccountManager manager;
 };
 
 #endif // MAINPAGE_H
