@@ -21,6 +21,7 @@ qt_add_executable(project
 
     account.h
     account_manager.h account_manager.cpp
+    addaccountdialog.h addaccountdialog.cpp
 
 )
 

@@ -1,7 +1,11 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
+#include "addaccountdialog.h"
 
+#include <QAbstractItemView>
 #include <QHeaderView>
+#include <QLocale>
+#include <QMessageBox>
 
 MainPage::MainPage(QWidget *parent)
     : QWidget(parent)
@@ -11,9 +15,9 @@ MainPage::MainPage(QWidget *parent)
 
     setWindowTitle("계좌 관리 대시보드");
 
-    ui->label_2->setText("TO55 BANK");
+    ui->label_2->setText("T055 BANK");
     ui->label->setText("총 자산 0원");
-    ui->label_3->setText("TO55 BANK");
+    ui->label_3->setText("T055 BANK");
     ui->label_4->setText("대표 계좌 : 0원");
     ui->home_user_name_label->setText("OOO님");
 
@@ -23,11 +27,21 @@ MainPage::MainPage(QWidget *parent)
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
     ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(36);
+    ui->tableWidget->verticalHeader()->setMinimumSectionSize(36);
+    ui->tableWidget_2->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableWidget_2->verticalHeader()->setDefaultSectionSize(36);
+    ui->tableWidget_2->verticalHeader()->setMinimumSectionSize(36);
 
     ui->tableWidget->setAlternatingRowColors(true);
     ui->tableWidget_2->setAlternatingRowColors(true);
     ui->tableWidget->setShowGrid(false);
     ui->tableWidget_2->setShowGrid(false);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableWidget_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     setStyleSheet(R"(
         QWidget#MainPage {
@@ -112,6 +126,13 @@ MainPage::MainPage(QWidget *parent)
         QPushButton#logout_btn:hover {
             background: #df5b4f;
         }
+        QPushButton#add_account_btn {
+            background: #2a9d8f;
+            min-width: 110px;
+        }
+        QPushButton#add_account_btn:hover {
+            background: #23897d;
+        }
         QPushButton#pushButton_2 {
             background: #1fbf8f;
         }
@@ -144,6 +165,13 @@ void MainPage::setUserName(const QString &userName)
     ui->home_user_name_label->setText(displayName);
 }
 
+void MainPage::setCurrentUser(const QString &userName, const QString &username)
+{
+    currentUsername = username;
+    setUserName(userName);
+    refreshAccountTable();
+}
+
 void MainPage::showHomePage()
 {
     ui->stackedWidget->setCurrentIndex(0);
@@ -151,11 +179,16 @@ void MainPage::showHomePage()
 
 void MainPage::showDetailPage()
 {
+    updateDetailHeader();
     ui->stackedWidget->setCurrentIndex(1);
 }
 
 void MainPage::on_logout_btn_clicked()
 {
+    currentUsername.clear();
+    manager.getAccounts().clear();
+    ui->home_user_name_label->setText("OOO님");
+    refreshAccountTable();
     showHomePage();
     emit logoutRequested();
 }
@@ -163,4 +196,106 @@ void MainPage::on_logout_btn_clicked()
 void MainPage::on_back_btn_clicked()
 {
     showHomePage();
+}
+
+void MainPage::on_add_account_btn_clicked()
+{
+    if (currentUsername.isEmpty()) {
+        QMessageBox::warning(this, "오류", "로그인한 사용자 정보가 없습니다.");
+        return;
+    }
+
+    AddAccountDialog dialog(this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    QString message;
+    const bool success = manager.addAccountToUser("users.json",
+                                                  currentUsername,
+                                                  dialog.bank(),
+                                                  dialog.accountNumber(),
+                                                  dialog.balance(),
+                                                  dialog.balancePassword(),
+                                                  message);
+
+    if (!success) {
+        QMessageBox::warning(this, "계좌 추가 실패", message);
+        return;
+    }
+
+    refreshAccountTable();
+    QMessageBox::information(this, "완료", message);
+}
+
+void MainPage::on_tableWidget_cellDoubleClicked(int row, int column)
+{
+    if (column != 0) {
+        return;
+    }
+
+    const QList<Account>& accounts = manager.getAccounts();
+    if (row < 0 || row >= accounts.size()) {
+        return;
+    }
+
+    manager.setCurrentIndex(row);
+    showDetailPage();
+}
+
+void MainPage::refreshAccountTable()
+{
+    ui->tableWidget->setRowCount(0);
+
+    if (currentUsername.isEmpty()) {
+        ui->label->setText("총 자산 0원");
+        ui->label_4->setText("대표 계좌 : 0원");
+        return;
+    }
+
+    if (!manager.loadFromJsonByUsername("users.json", currentUsername)) {
+        ui->label->setText("총 자산 0원");
+        ui->label_4->setText("대표 계좌 : 0원");
+        return;
+    }
+
+    const QList<Account>& accounts = manager.getAccounts();
+    ui->tableWidget->setRowCount(accounts.size());
+
+    for (int row = 0; row < accounts.size(); ++row) {
+        const Account& account = accounts[row];
+        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(account.getBank()));
+        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(account.getAccountNumber()));
+        ui->tableWidget->setItem(row, 2, new NumericTableWidgetItem(formatMoney(account.getBalance())));
+    }
+
+    ui->label->setText("총 자산 " + formatMoney(manager.getTotalBalance()));
+
+    if (!accounts.isEmpty()) {
+        const Account& firstAccount = accounts.first();
+        ui->label_4->setText(firstAccount.getBank() + " : " + formatMoney(firstAccount.getBalance()));
+    } else {
+        ui->label_4->setText("대표 계좌 : 0원");
+    }
+}
+
+QString MainPage::formatMoney(int amount) const
+{
+    return QLocale(QLocale::Korean, QLocale::SouthKorea).toString(amount) + "원";
+}
+
+void MainPage::updateDetailHeader()
+{
+    const QList<Account>& accounts = manager.getAccounts();
+    const int currentIndex = manager.getCurrentIndex();
+
+    if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
+        ui->label_4->setText("대표 계좌 : 0원");
+        return;
+    }
+
+    const Account& currentAccount = accounts[currentIndex];
+    ui->label_4->setText(currentAccount.getBank() + " " +
+                         currentAccount.getAccountNumber() + " : " +
+                         formatMoney(currentAccount.getBalance()));
 }
