@@ -35,6 +35,7 @@ private slots:
     void on_pushButton_3_clicked();
     void on_pushButton_clicked();
     void on_tableWidget_2_itemChanged(QTableWidgetItem *item);
+    void on_delete_account_btn_clicked();
 
     void on_lineEdit_textChanged(const QString &arg1);
 
@@ -56,6 +57,7 @@ private:
     QString currentUsername;
     QString currentOwnerName;
     bool updatingTransactionTable = false;
+    bool accountDeleted = false;
 };
 
 #endif // MAINPAGE_H

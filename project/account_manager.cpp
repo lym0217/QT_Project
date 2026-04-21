@@ -492,6 +492,52 @@ bool AccountManager::updateTransactionNote(const QString& filePath,
     return false;
 }
 
+bool AccountManager::deleteUserByContact(const QString& filePath,
+                                         const QString& username,
+                                         const QString& phone,
+                                         const QString& email,
+                                         QString& message)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        message = "사용자 파일을 열 수 없습니다.";
+        return false;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+
+    QJsonObject root = doc.object();
+    QJsonArray users = root["users"].toArray();
+
+    for (int i = 0; i < users.size(); ++i) {
+        const QJsonObject user = users[i].toObject();
+        if (user["username"].toString() != username) continue;
+
+        if (user["phone"].toString() != phone.trimmed() ||
+            user["email"].toString() != email.trimmed()) {
+            message = "전화번호와 이메일이 일치하지 않습니다.";
+            return false;
+        }
+
+        users.removeAt(i);
+        root["users"] = users;
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            message = "계정 정보를 저장할 수 없습니다.";
+            return false;
+        }
+
+        file.write(QJsonDocument(root).toJson());
+        file.close();
+        message = "계정이 삭제되었습니다.";
+        return true;
+    }
+
+    message = "삭제할 계정을 찾을 수 없습니다.";
+    return false;
+}
+
 // 원본 계좌 호출
 QList<Account>& AccountManager::getAccounts()
 {

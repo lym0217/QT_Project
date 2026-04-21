@@ -113,6 +113,9 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
             border: 2px solid #5495d8;
         }
         QPushButton {
+            background: white;
+            color: black;
+            border: 1px solid black;
             border-radius: 12px;
             padding: 10px 16px;
             font-size: 13px;
@@ -120,14 +123,14 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
             min-width: 120px;
         }
         QPushButton#confirmButton {
-            background: #2f80ed;
-            color: white;
-            border: none;
+            background: white;
+            color: black;
+            border: 1px solid black;
         }
         QPushButton#cancelButton {
             background: white;
-            color: #29465b;
-            border: 1px solid #d0dfeb;
+            color: black;
+            border: 1px solid black;
         }
     )");
 }
