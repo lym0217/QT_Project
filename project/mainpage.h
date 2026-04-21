@@ -30,6 +30,13 @@ private slots:
     void on_add_account_btn_clicked();
     void on_tableWidget_cellDoubleClicked(int row, int column);
 
+
+    void on_deposit_btn_clicked();
+
+    void on_withdraw_btn_clicked();
+
+    void on_trasfer_btn_clicked();
+
 private:
     void refreshAccountTable();
     QString formatMoney(int amount) const;
@@ -38,6 +45,10 @@ private:
     Ui::MainPage *ui;
     AccountManager manager;
     QString currentUsername;
+
+    // 입금 출금 송금 후 테이블, 잔고 갱신함수
+    void refreshUI();
+    void updateHistoryTable();
 };
 
 #endif // MAINPAGE_H

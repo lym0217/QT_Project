@@ -24,9 +24,15 @@ public:
                           int balancePw,
                           QString& message);
 
+    bool deposit(int amount);           //입금
+    bool withdraw(int amount);          //출금
+    bool transfer(int amount, QString targetBank, bool isMyAccount, QString fromBank);
+                                        //송금
 private:
     QList<Account> accounts;
     int currentIndex;
+    QString currentFilePath;  // saveToJson 편하게 쓰려고
+    int currentUserId;
 };
 
 #endif // ACCOUNT_MANAGER_H

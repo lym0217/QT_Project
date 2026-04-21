@@ -32,12 +32,15 @@ private:
 // 계좌 금액, 기록
 class Account {
 public:
-    Account(QString bank, QString accountNumber, int balance = 0)           // bank: 은행이름, balance: 초기 잔액
-        : bank(bank), accountNumber(accountNumber), balance(balance) {}
+
+    Account(QString bank, QString accountNumber, int balance = 0, int balancePw = 0)
+        : bank(bank), accountNumber(accountNumber), balance(balance), balancePw(balancePw) {}       // bank: 은행이름, balance: 초기 잔액
 
     QString getBank()          const { return bank; }
     QString getAccountNumber() const { return accountNumber; }
-    int     getBalance()       const { return balance; }
+    int getBalance()       const { return balance; }
+    int getBalancePw() const { return balancePw; }
+    bool checkPassword(int pw) const { return balancePw == pw; }  // 비밀번호 검증
 
     void deposit(int amount)
     {
@@ -59,10 +62,11 @@ public:
     }
 
 private:
-    QString            bank;                // 은행이름
-    QString            accountNumber;       // 계좌 번호
-    int                balance;             // 현재 잔액
+    QString bank;                // 은행이름
+    QString accountNumber;       // 계좌 번호
     QList<Transaction> history;             // 거래 내역 리스트
+    int balance;                // 현재 잔액
+    int balancePw;              // pw
 };
 
 // 금액정렬 시 ,로 인한 정렬 오류를 해결
