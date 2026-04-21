@@ -99,6 +99,15 @@ LoginPage::~LoginPage()
     delete ui;
 }
 
+void LoginPage::clearInputs()
+{
+    ui->id_lineEdit->clear();
+    ui->pw_lineEdit->clear();
+    ui->pw_checkBox->setChecked(false);
+    ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
+    ui->id_lineEdit->setFocus();
+}
+
 void LoginPage::on_login_btn_clicked()
 {
     QString id = ui->id_lineEdit->text();
@@ -138,7 +147,7 @@ void LoginPage::on_login_btn_clicked()
             obj["password"].toString() == hashedPw)
         {
             // 로그인 성공
-            emit loginSuccess(obj["name"].toString());   // 로그인한 사용자 이름 전달
+            emit loginSuccess(obj["name"].toString(), obj["username"].toString());
             return;
         }
     }

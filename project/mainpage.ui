@@ -21,7 +21,7 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -72,22 +72,51 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="label">
-               <property name="font">
-                <font>
-                 <pointsize>20</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>총 자산 : ~~원</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_summary">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="font">
+                  <font>
+                   <pointsize>20</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>총 자산 : ~~원</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_add_account">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="add_account_btn">
+                 <property name="text">
+                  <string>계좌 추가</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QTableWidget" name="tableWidget">
                <column>
                 <property name="text">
                  <string>은행명</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>계좌번호</string>
                 </property>
                </column>
                <column>
@@ -145,12 +174,7 @@
             <widget class="QTableWidget" name="tableWidget_2">
              <column>
               <property name="text">
-               <string>날짜</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>시간</string>
+               <string>날짜 / 시간</string>
               </property>
              </column>
              <column>

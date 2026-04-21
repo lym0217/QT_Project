@@ -14,9 +14,10 @@ class LoginPage : public QWidget
 public:
     explicit LoginPage(QWidget *parent = nullptr);
     ~LoginPage();
+    void clearInputs();
 
 signals:
-    void loginSuccess(const QString &userName);
+    void loginSuccess(const QString &userName, const QString &username);
 
 private slots:
     void on_login_btn_clicked();
