@@ -15,7 +15,6 @@ MainPage::MainPage(QWidget *parent)
     , ui(new Ui::MainPage)
 {
     ui->setupUi(this);
-
     setWindowTitle("계좌 관리 대시보드");
 
     ui->label_2->setText("T055 BANK");
@@ -505,30 +504,23 @@ void MainPage::refreshTransactionTable()
 
     for (int row = 0; row < history.size(); ++row) {
         const Transaction& transaction = history[row];
-        const QStringList dateTime = transaction.getDatetime().split(' ');
-        const QString dateText = dateTime.value(0);
-        const QString timeText = dateTime.value(1);
-
-        auto *dateItem = new QTableWidgetItem(dateText);
-        auto *timeItem = new QTableWidgetItem(timeText);
+        auto *dateTimeItem = new QTableWidgetItem(transaction.getDatetime());
         auto *typeItem = new QTableWidgetItem(transaction.getType());
         auto *targetItem = new QTableWidgetItem(transaction.getTarget());
         auto *amountItem = new NumericTableWidgetItem(formatMoney(transaction.getAmount()));
         auto *noteItem = new QTableWidgetItem(transaction.getNote());
         noteItem->setData(Qt::UserRole, row);
 
-        dateItem->setFlags(dateItem->flags() & ~Qt::ItemIsEditable);
-        timeItem->setFlags(timeItem->flags() & ~Qt::ItemIsEditable);
+        dateTimeItem->setFlags(dateTimeItem->flags() & ~Qt::ItemIsEditable);
         typeItem->setFlags(typeItem->flags() & ~Qt::ItemIsEditable);
         targetItem->setFlags(targetItem->flags() & ~Qt::ItemIsEditable);
         amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
 
-        ui->tableWidget_2->setItem(row, 0, dateItem);
-        ui->tableWidget_2->setItem(row, 1, timeItem);
-        ui->tableWidget_2->setItem(row, 2, typeItem);
-        ui->tableWidget_2->setItem(row, 3, targetItem);
-        ui->tableWidget_2->setItem(row, 4, amountItem);
-        ui->tableWidget_2->setItem(row, 5, noteItem);
+        ui->tableWidget_2->setItem(row, 0, dateTimeItem);
+        ui->tableWidget_2->setItem(row, 1, typeItem);
+        ui->tableWidget_2->setItem(row, 2, targetItem);
+        ui->tableWidget_2->setItem(row, 3, amountItem);
+        ui->tableWidget_2->setItem(row, 4, noteItem);
     }
 
     updatingTransactionTable = false;
@@ -536,7 +528,7 @@ void MainPage::refreshTransactionTable()
 
 void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
 {
-    if (updatingTransactionTable || item == nullptr || item->column() != 5) {
+    if (updatingTransactionTable || item == nullptr || item->column() != 4) {
         return;
     }
 
@@ -545,9 +537,22 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
         return;
     }
 
-    manager.updateTransactionNote("users.json",
-                                  currentUsername,
-                                  accountNumber,
-                                  item->data(Qt::UserRole).toInt(),
-                                  item->text());
+    const int historyIndex = item->data(Qt::UserRole).toInt();
+    const int currentIndex = manager.getCurrentIndex();
+    if (currentIndex >= 0 && currentIndex < manager.getAccounts().size()) {
+        QList<Transaction> &history = manager.getAccounts()[currentIndex].getHistory();
+        if (historyIndex >= 0 && historyIndex < history.size()) {
+            history[historyIndex].setNote(item->text().trimmed());
+        }
+    }
+
+    const bool saved = manager.updateTransactionNote("users.json",
+                                                     currentUsername,
+                                                     accountNumber,
+                                                     historyIndex,
+                                                     item->text().trimmed());
+
+    if (!saved) {
+        QMessageBox::warning(this, "메모 저장 실패", "메모를 JSON 파일에 저장하지 못했습니다.");
+    }
 }
