@@ -19,6 +19,8 @@ qt_add_executable(project
     signupmanager.h signupmanager.cpp
 
 
+    account.h
+    account_manager.h account_manager.cpp
 
 )
 
