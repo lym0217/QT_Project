@@ -53,6 +53,11 @@ public:
                                const QString& accountNumber,
                                int historyIndex,
                                const QString& note);
+    bool deleteUserByContact(const QString& filePath,
+                             const QString& username,
+                             const QString& phone,
+                             const QString& email,
+                             QString& message);
 
 private:
     QList<Account> accounts;

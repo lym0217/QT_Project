@@ -1,6 +1,7 @@
 #include "mainpage.h"
 #include "ui_mainpage.h"
 #include "addaccountdialog.h"
+#include "deleteaccountdialog.h"
 #include "transactiondialog.h"
 #include "transferdialog.h"
 
@@ -87,6 +88,18 @@ MainPage::MainPage(QWidget *parent)
             border: 1px solid #d4e4f1;
             border-radius: 14px;
             min-width: 88px;
+        }
+        QPushButton#delete_account_btn {
+            background: white;
+            color: #a23d3d;
+            border: 1px solid #d59d9d;
+            border-radius: 10px;
+            padding: 6px 10px;
+            min-width: 72px;
+        }
+        QPushButton#delete_account_btn:hover {
+            background: #fff4f4;
+            border-color: #c97f7f;
         }
         QTableWidget {
             background: rgba(255, 255, 255, 0.88);
@@ -195,6 +208,7 @@ void MainPage::on_logout_btn_clicked()
     currentOwnerName.clear();
     manager.getAccounts().clear();
     ui->home_user_name_label->setText("OOO님");
+    accountDeleted = false;
     refreshAccountTable();
     showHomePage();
     emit logoutRequested();
@@ -555,4 +569,33 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
     if (!saved) {
         QMessageBox::warning(this, "메모 저장 실패", "메모를 JSON 파일에 저장하지 못했습니다.");
     }
+}
+
+void MainPage::on_delete_account_btn_clicked()
+{
+    if (currentUsername.isEmpty()) {
+        QMessageBox::warning(this, "오류", "현재 로그인한 계정이 없습니다.");
+        return;
+    }
+
+    DeleteAccountDialog dialog(this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    QString message;
+    const bool deleted = manager.deleteUserByContact("users.json",
+                                                     currentUsername,
+                                                     dialog.phone(),
+                                                     dialog.email(),
+                                                     message);
+
+    if (!deleted) {
+        QMessageBox::warning(this, "계정 삭제 실패", message);
+        return;
+    }
+
+    accountDeleted = true;
+    QMessageBox::information(this, "완료", message);
+    on_logout_btn_clicked();
 }
