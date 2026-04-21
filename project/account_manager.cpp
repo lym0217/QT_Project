@@ -206,6 +206,11 @@ bool AccountManager::depositToAccount(const QString& filePath,
                 message = "계좌 비밀번호가 올바르지 않습니다.";
                 return false;
             }
+            // 1억원 초과 메세지
+            if (amount > 100000000) {
+                message = "1회 입금 한도(1억 원)를 초과할 수 없습니다.";
+                return false;
+            }
 
             account["balance"] = account["balance"].toInt() + amount;
             QJsonArray history = account["history"].toArray();
