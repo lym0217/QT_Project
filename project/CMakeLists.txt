@@ -15,6 +15,8 @@ qt_add_executable(project
     mainWindow.h mainWindow.cpp
     mainpage.h mainpage.cpp mainpage.ui
     resources.qrc
+    account.h
+    account_manager.h account_manager.cpp
 
 )
 
