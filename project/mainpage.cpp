@@ -175,10 +175,6 @@ void MainPage::on_trasfer_btn_clicked()
         int amount = dlg.getTransferAmount();
         int pw = dlg.getPassword();
         QString targetBank = dlg.getTargetBank();
-        qDebug() << "amount:" << amount;
-        qDebug() << "targetBank:" << targetBank;
-        qDebug() << "isMyAccount:" << dlg.isMyAccountTransfer();
-
         // 1순위: 금액 한도 체크
         if (amount > 100000000) {
             QMessageBox::warning(this, "한도 초과", "1회 한도는 100,000,000원입니다.");

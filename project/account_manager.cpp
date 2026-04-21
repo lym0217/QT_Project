@@ -80,10 +80,6 @@ bool AccountManager::withdraw(int amount)
 // 송금 로직
 bool AccountManager::transfer(int amount, QString targetBank, bool isMyAccount, QString fromBank)
 {
-    qDebug() << "transfer 호출됨";
-    qDebug() << "amount:" << amount;
-    qDebug() << "isMyAccount:" << isMyAccount;
-
     if(amount <= 0 || amount > 100000000) { qDebug() << "한도초과로 return"; return false; }
     if(amount > accounts[currentIndex].getBalance()) { qDebug() << "잔액부족으로 return"; return false; }
 
