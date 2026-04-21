@@ -14,8 +14,15 @@ public:
     int  getCurrentIndex() const;
     int  getTotalBalance() const;
 
-    bool loadFromJson(const QString& filePath, int userId);  // Json 불러오기
-    bool saveToJson(const QString& filePath, int userId);    // Json에 저장
+    bool loadFromJson(const QString& filePath, int userId);  // 추가
+    bool loadFromJsonByUsername(const QString& filePath, const QString& username);
+    bool addAccountToUser(const QString& filePath,
+                          const QString& username,
+                          const QString& bank,
+                          const QString& accountNumber,
+                          int balance,
+                          int balancePw,
+                          QString& message);
 
     bool deposit(int amount);           //입금
     bool withdraw(int amount);          //출금

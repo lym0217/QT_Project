@@ -28,32 +28,95 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,3">
              <item>
-              <widget class="QLabel" name="label_2">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="text">
-                <string>[TO55]</string>
-               </property>
-              </widget>
+              <layout class="QGridLayout" name="gridLayout_home_header">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="text">
+                  <string>[TO55]</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <spacer name="horizontalSpacer_home">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="home_user_name_label">
+                 <property name="text">
+                  <string>OOO님</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="3">
+                <widget class="QPushButton" name="logout_btn">
+                 <property name="text">
+                  <string>로그아웃</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
-              <widget class="QLabel" name="label">
-               <property name="font">
-                <font>
-                 <pointsize>20</pointsize>
-                </font>
-               </property>
-               <property name="text">
-                <string>총 자산 : ~~원</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_summary">
+               <item>
+                <widget class="QLabel" name="label">
+                 <property name="font">
+                  <font>
+                   <pointsize>20</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>총 자산 : ~~원</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_add_account">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="add_account_btn">
+                 <property name="text">
+                  <string>계좌 추가</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QTableWidget" name="tableWidget">
                <column>
                 <property name="text">
                  <string>은행명</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>계좌번호</string>
                 </property>
                </column>
                <column>
@@ -71,17 +134,30 @@
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="1" rowspan="2">
-              <widget class="QPushButton" name="pushButton_4">
-               <property name="text">
-                <string>뒤로 가기</string>
+             <item row="0" column="1">
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
-              </widget>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
-             <item row="0" column="0" rowspan="2">
+             <item row="0" column="0">
               <widget class="QLabel" name="label_3">
                <property name="text">
                 <string>[TO55]</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="back_btn">
+               <property name="text">
+                <string>뒤로 가기</string>
                </property>
               </widget>
              </item>

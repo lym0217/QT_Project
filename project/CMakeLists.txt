@@ -15,11 +15,16 @@ qt_add_executable(project
     mainWindow.h mainWindow.cpp
     mainpage.h mainpage.cpp mainpage.ui
     resources.qrc
+    signup.h signup.cpp signup.ui
+    signupmanager.h signupmanager.cpp
+
+
     account.h
     account_manager.h account_manager.cpp
     tx_dialog.h tx_dialog.cpp tx_dialog.ui
     transfer_dialog.h transfer_dialog.cpp transfer_dialog.ui
 
+    addaccountdialog.h addaccountdialog.cpp
 
 )
 
