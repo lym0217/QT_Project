@@ -272,6 +272,11 @@ bool AccountManager::withdrawFromAccount(const QString& filePath,
                 message = "계좌 비밀번호가 올바르지 않습니다.";
                 return false;
             }
+            // 1억원 초과 메세지
+            if (amount > 100000000) {
+                message = "1회 입금 한도(1억 원)를 초과할 수 없습니다.";
+                return false;
+            }
 
             if (account["balance"].toInt() < amount) {
                 message = "잔액이 부족합니다.";
@@ -358,6 +363,11 @@ bool AccountManager::transferBetweenAccounts(const QString& filePath,
 
     if (senderAccount["balance_pw"].toInt() != balancePw) {
         message = "계좌 비밀번호가 올바르지 않습니다.";
+        return false;
+    }
+    // 1억원 초과 메세지
+    if (amount > 100000000) {
+        message = "1회 입금 한도(1억 원)를 초과할 수 없습니다.";
         return false;
     }
 

@@ -51,7 +51,7 @@ TransactionDialog::TransactionDialog(const QString &actionName,
     passwordLayout->addWidget(passwordLabel);
     passwordLayout->addWidget(passwordEdit);
 
-    auto *limitLabel = new QLabel("일일금액한도 1억", this);
+    auto *limitLabel = new QLabel("이체금액한도 1억", this);
     limitLabel->setAlignment(Qt::AlignCenter);
     limitLabel->setObjectName("limitLabel");
 
