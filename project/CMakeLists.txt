@@ -24,6 +24,7 @@ qt_add_executable(project
     addaccountdialog.h addaccountdialog.cpp
     transactiondialog.h transactiondialog.cpp
     transferdialog.h transferdialog.cpp
+    deleteaccountdialog.h deleteaccountdialog.cpp
 
 )
 

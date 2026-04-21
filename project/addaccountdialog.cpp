@@ -123,8 +123,8 @@ AddAccountDialog::AddAccountDialog(QWidget *parent)
         }
     )");
 
-    okButton->setStyleSheet("background:#2a9d8f; color:white;");
-    cancelButton->setStyleSheet("background:#e9eef4; color:#435767; border:1px solid #d2dce6;");
+    okButton->setStyleSheet("background:white; color:black; border:1px solid black;");
+    cancelButton->setStyleSheet("background:white; color:black; border:1px solid black;");
 }
 
 QString AddAccountDialog::bank() const
