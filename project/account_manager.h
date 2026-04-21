@@ -9,6 +9,7 @@ public:
     AccountManager();
 
     QList<Account>& getAccounts();
+    const QList<Account>& getAccounts() const;
     Account& getCurrentAccount();
     void setCurrentIndex(int index);
     int  getCurrentIndex() const;
@@ -23,6 +24,35 @@ public:
                           int balance,
                           int balancePw,
                           QString& message);
+    bool depositToAccount(const QString& filePath,
+                          const QString& username,
+                          const QString& ownerName,
+                          const QString& accountNumber,
+                          int amount,
+                          int balancePw,
+                          QString& message);
+    bool withdrawFromAccount(const QString& filePath,
+                             const QString& username,
+                             const QString& ownerName,
+                             const QString& accountNumber,
+                             int amount,
+                             int balancePw,
+                             QString& message);
+    bool transferBetweenAccounts(const QString& filePath,
+                                 const QString& username,
+                                 const QString& ownerName,
+                                 const QString& fromAccountNumber,
+                                 const QString& targetBank,
+                                 const QString& targetAccountNumber,
+                                 int amount,
+                                 int balancePw,
+                                 bool ownAccountTransfer,
+                                 QString& message);
+    bool updateTransactionNote(const QString& filePath,
+                               const QString& username,
+                               const QString& accountNumber,
+                               int historyIndex,
+                               const QString& note);
 
 private:
     QList<Account> accounts;

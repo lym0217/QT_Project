@@ -4,6 +4,8 @@
 #include <QWidget>
 #include "account_manager.h"
 
+class QTableWidgetItem;
+
 namespace Ui {
 class MainPage;
 }
@@ -29,15 +31,29 @@ private slots:
     void on_back_btn_clicked();
     void on_add_account_btn_clicked();
     void on_tableWidget_cellDoubleClicked(int row, int column);
+    void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
+    void on_pushButton_clicked();
+    void on_tableWidget_2_itemChanged(QTableWidgetItem *item);
 
 private:
     void refreshAccountTable();
+    void refreshTransactionTable();
     QString formatMoney(int amount) const;
     void updateDetailHeader();
+    QString currentAccountSummary() const;
+    QStringList currentAccountOptions() const;
+    QString currentAccountNumber() const;
+    void handleTransactionDialog(const QString &actionName,
+                                 const QString &targetBank = QString(),
+                                 const QString &targetAccountNumber = QString(),
+                                 bool ownAccountTransfer = false);
 
     Ui::MainPage *ui;
     AccountManager manager;
     QString currentUsername;
+    QString currentOwnerName;
+    bool updatingTransactionTable = false;
 };
 
 #endif // MAINPAGE_H

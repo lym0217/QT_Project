@@ -137,12 +137,7 @@ void SignUp::on_ok_btn_clicked()
 
     if(success)
     {
-        QMessageBox::information(this, "성공", message);
         accept();   // ⭐ Dialog 닫기
-    }
-    else
-    {
-        QMessageBox::warning(this, "실패", message);
     }
 }
 void SignUp::on_cancel_btn_clicked()

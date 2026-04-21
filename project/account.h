@@ -13,6 +13,8 @@ public:
     {
         datetime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
     }
+    Transaction(QString type, int amount, QString target, QString note, QString datetime)
+        : type(type), amount(amount), datetime(datetime), target(target), note(note) {}
 // 입금, 출금, 송금 보낼 때마다 정리되는 type들
     QString getType()        const { return type; }     // 거래 종류: 입금-출금-송금
     QString getDatetime()    const { return datetime; } // 거래가 이뤄지는 시간
@@ -52,8 +54,16 @@ public:
     {
         history.append(Transaction(type, amount, target, note));
     }
+    void addTransaction(QString type, int amount, QString target, QString note, QString datetime)
+    {
+        history.append(Transaction(type, amount, target, note, datetime));
+    }
 
     QList<Transaction>& getHistory()
+    {
+        return history;
+    }
+    const QList<Transaction>& getHistory() const
     {
         return history;
     }
