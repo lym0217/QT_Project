@@ -16,7 +16,7 @@ public:
     ~LoginPage();
 
 signals:
-    void loginSuccess();
+    void loginSuccess(const QString &userName);
 
 private slots:
     void on_login_btn_clicked();

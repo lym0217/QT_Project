@@ -14,6 +14,84 @@ LoginPage::LoginPage(QWidget *parent)
 {
     ui->setupUi(this);
     ui->pw_checkBox->setIcon(QIcon(":/resources/hidden1.png"));
+
+    setWindowTitle("간편 입출금 계좌 관리");
+
+    ui->label->setText("T055");
+    ui->label_2->setText("아이디");
+    ui->label_3->setText("비밀번호");
+    ui->id_lineEdit->setPlaceholderText("아이디를 입력하세요");
+    ui->pw_lineEdit->setPlaceholderText("비밀번호를 입력하세요");
+    ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
+    ui->pw_checkBox->setCursor(Qt::PointingHandCursor);
+
+    setStyleSheet(R"(
+        QWidget#LoginPage {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                        stop:0 #eef6ff, stop:0.55 #dff4ee, stop:1 #fff3dc);
+        }
+        QLabel {
+            color: #284b63;
+        }
+        QLabel#label {
+            color: #10324a;
+            font-size: 38px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: 28px;
+            margin-bottom: 18px;
+        }
+        QLabel#label_2, QLabel#label_3 {
+            color: #47657a;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 0;
+        }
+        QLineEdit {
+            background: rgba(255, 255, 255, 0.92);
+            color: #163447;
+            border: 2px solid #c8deeb;
+            border-radius: 12px;
+            padding: 10px 14px;
+            min-height: 20px;
+            selection-background-color: #63c3b2;
+        }
+        QLineEdit:focus {
+            border-color: #4f9fd8;
+            background: #ffffff;
+        }
+        QPushButton {
+            border: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        QPushButton#login_btn {
+            color: white;
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                        stop:0 #2f80ed, stop:1 #3bb2b8);
+        }
+        QPushButton#login_btn:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                        stop:0 #2472db, stop:1 #32a2a8);
+        }
+        QPushButton#pushButton {
+            color: #1b4965;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid #bcd4e6;
+        }
+        QPushButton#pushButton:hover {
+            background: rgba(255, 255, 255, 0.96);
+        }
+        QCheckBox {
+            spacing: 0px;
+        }
+        QCheckBox::indicator {
+            width: 28px;
+            height: 28px;
+        }
+    )");
 }
 
 LoginPage::~LoginPage()
@@ -60,7 +138,7 @@ void LoginPage::on_login_btn_clicked()
             obj["password"].toString() == hashedPw)
         {
             // 로그인 성공
-            emit loginSuccess();   // 나중에는 사용자에 따른 계좌 리스트 출력
+            emit loginSuccess(obj["name"].toString());   // 로그인한 사용자 이름 전달
             return;
         }
     }
