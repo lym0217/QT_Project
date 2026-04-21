@@ -12,9 +12,9 @@ MainPage::MainPage(QWidget *parent)
     setWindowTitle("계좌 관리 대시보드");
 
     ui->label_2->setText("TO55 BANK");
-    ui->label->setText("총 자산 12,480,000원");
+    ui->label->setText("총 자산 0원");
     ui->label_3->setText("TO55 BANK");
-    ui->label_4->setText("대표 계좌 : 4,820,000원");
+    ui->label_4->setText("대표 계좌 : 0원");
     ui->home_user_name_label->setText("OOO님");
 
     showHomePage();
