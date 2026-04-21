@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>transfer_dialog</class>
+ <widget class="QDialog" name="transfer_dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>648</width>
+    <height>531</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="0">
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="page">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>[T055]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QRadioButton" name="other_radio">
+           <property name="text">
+            <string>&lt;다른 계좌로 보내기</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="mybank_comboBox"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QRadioButton" name="my_radio">
+           <property name="text">
+            <string>&lt;내 계좌로 보내기&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>은행 선택</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>어디로 돈을 보낼까요?</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="account_number">
+           <property name="placeholderText">
+            <string>계좌 번호를 입력하세요.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QComboBox" name="other_comboBox">
+           <item>
+            <property name="text">
+             <string>NH농혁은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>KD국닌은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>카카5뱅크</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>New Item</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>신둘은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>T055뱅크</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LBK기업은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>NG헌마을금고</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>좌체국은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>두리은행</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>혼자은행</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>계좌 번호 입력</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QDialogButtonBox" name="buttonBox_2">
+           <property name="standardButtons">
+            <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2">
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="3" column="0">
+          <widget class="QLabel" name="transfer_bank">
+           <property name="text">
+            <string>~~은행 :</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>&lt;송금 계좌&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>보유 금액 :</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>비밀번호 : </string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="money_lineEdit">
+           <property name="placeholderText">
+            <string>금액을 입력하세요.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="current_account">
+           <property name="text">
+            <string>~~ 은행 : </string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="QDialogButtonBox" name="buttonBox">
+           <property name="standardButtons">
+            <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>금액 :</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="pw_lineEdit">
+           <property name="placeholderText">
+            <string>계좌 비밀번호를 입력하세요.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>&lt;현재 계좌&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="current_money">
+           <property name="text">
+            <string>~~ 원</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="transfer_account_2">
+           <property name="text">
+            <string> 잔액? OR 계좌번호</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>송금 금액 한도는 100,000,000원입니다.</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

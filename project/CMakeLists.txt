@@ -17,6 +17,9 @@ qt_add_executable(project
     resources.qrc
     account.h
     account_manager.h account_manager.cpp
+    tx_dialog.h tx_dialog.cpp tx_dialog.ui
+    transfer_dialog.h transfer_dialog.cpp transfer_dialog.ui
+
 
 )
 

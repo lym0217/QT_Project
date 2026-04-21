@@ -21,7 +21,7 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -88,19 +88,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>계좌명 : 잔고</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QTableWidget" name="tableWidget_2">
-             <column>
-              <property name="text">
-               <string>날짜</string>
-              </property>
-             </column>
              <column>
               <property name="text">
                <string>시간</string>
@@ -129,23 +117,30 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="current_account">
+             <property name="text">
+              <string>계좌명 : 잔고</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="deposit_btn">
                <property name="text">
                 <string>입금</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="withdraw_btn">
                <property name="text">
                 <string>출금</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="trasfer_btn">
                <property name="text">
                 <string>송금</string>
                </property>
