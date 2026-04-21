@@ -4,133 +4,200 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-AccountManager::AccountManager()
+namespace {
+Account accountFromJson(const QJsonObject& accountObject)
 {
-    currentIndex = 0;
-    // 헤더에서 만든것 초기화
-    currentFilePath = "";
-    currentUserId = 0;
+    Account account(accountObject["bank"].toString(),
+                    accountObject["account_number"].toString(),
+                    accountObject["balance"].toInt(),
+                    accountObject["balance_pw"].toInt());
+
+    const QJsonArray history = accountObject["history"].toArray();
+    for (const auto& txValue : history) {
+        const QJsonObject tx = txValue.toObject();
+        account.addTransaction(tx["type"].toString(),
+                               tx["amount"].toInt(),
+                               tx["target"].toString(),
+                               tx["note"].toString(),
+                               tx["datetime"].toString());
+    }
+
+    return account;
 }
 
-// Json파일 받기
-bool AccountManager::loadFromJson(const QString& filePath, int userId)
+QJsonObject transactionToJson(const Transaction& tx)
 {
-    currentFilePath = filePath;
-    currentUserId = userId;
+    QJsonObject txObject;
+    txObject["type"] = tx.getType();
+    txObject["amount"] = tx.getAmount();
+    txObject["target"] = tx.getTarget();
+    txObject["note"] = tx.getNote();
+    txObject["datetime"] = tx.getDatetime();
+    return txObject;
+}
 
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) return false;
+QJsonObject accountToJson(const Account& account)
+{
+    QJsonObject accountObject;
+    accountObject["account_number"] = account.getAccountNumber();
+    accountObject["bank"] = account.getBank();
+    accountObject["balance"] = account.getBalance();
+    accountObject["balance_pw"] = account.getBalancePw();
 
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonArray users = doc.object()["users"].toArray();
-
-    for (const auto& userVal : users) {
-        QJsonObject user = userVal.toObject();
-
-        // userId 일치하는 유저 찾기
-        if (user["user_id"].toInt() != userId) continue;
-
-        QJsonArray accs = user["accounts"].toArray();
-        accounts.clear();
-
-        for (const auto& accVal : accs) {
-            QJsonObject acc = accVal.toObject();
-            QString bank = acc["bank"].toString();
-            QString accNum = acc["account_number"].toString();
-            int balance = acc["balance"].toInt();
-            int balancePw = acc["balance_pw"].toInt();
-            Account a(bank, accNum, balance, balancePw);
-
-            // 히스토리 복원
-            QJsonArray history = acc["history"].toArray();
-            for (const auto& txVal : history) {
-                QJsonObject tx = txVal.toObject();
-                a.addTransaction(tx["type"].toString(),
-                                 tx["amount"].toInt(),
-                                 tx["target"].toString(),
-                                 tx["note"].toString());
-            }
-            accounts << a;
-        }
-        return true;
+    QJsonArray historyArray;
+    for (const auto& tx : account.getHistory()) {
+        historyArray.append(transactionToJson(tx));
     }
-    return false;  // userId 못 찾은 경우
+    accountObject["history"] = historyArray;
+
+    return accountObject;
+}
+}
+
+AccountManager::AccountManager()
+    : currentIndex(0)
+{
 }
 
 
 // 입금 로직
 bool AccountManager::deposit(int amount)
 {
-    if(amount > 100000000) return false;
-    accounts[currentIndex].deposit(amount);                             // ← Account 메서드 사용
+    if (!hasValidCurrentAccount() || amount <= 0 || amount > 100000000) {
+        return false;
+    }
+
+    const QList<Account> backup = accounts;
+    accounts[currentIndex].deposit(amount);
     accounts[currentIndex].addTransaction("입금", amount, "본인");
+
+    if (!saveCurrentUserAccounts()) {
+        accounts = backup;
+        return false;
+    }
+
     return true;
 }
 
 // 출금 로직
 bool AccountManager::withdraw(int amount)
 {
-    if(amount > 100000000) return false;
-    if(amount > accounts[currentIndex].getBalance()) return false;      // ← getter 사용
-    accounts[currentIndex].withdraw(amount);                            // ← Account 메서드 사용
+    if (!hasValidCurrentAccount() || amount <= 0 || amount > 100000000) {
+        return false;
+    }
+    if (amount > accounts[currentIndex].getBalance()) {
+        return false;
+    }
+
+    const QList<Account> backup = accounts;
+    accounts[currentIndex].withdraw(amount);
     accounts[currentIndex].addTransaction("출금", amount, "본인");
+
+    if (!saveCurrentUserAccounts()) {
+        accounts = backup;
+        return false;
+    }
+
     return true;
 }
 
 // 송금 로직
-bool AccountManager::transfer(int amount, QString targetBank, bool isMyAccount, QString fromBank)
+bool AccountManager::transfer(int amount,
+                              const QString& targetBank,
+                              const QString& targetAccountNumber,
+                              bool isMyAccount,
+                              const QString& fromBank)
 {
-    if(amount <= 0 || amount > 100000000) { qDebug() << "한도초과로 return"; return false; }
-    if(amount > accounts[currentIndex].getBalance()) { qDebug() << "잔액부족으로 return"; return false; }
+    if (!hasValidCurrentAccount() || amount <= 0 || amount > 100000000) {
+        return false;
+    }
+    if (amount > accounts[currentIndex].getBalance()) {
+        return false;
+    }
 
-    if(amount <= 0 || amount > 100000000) return false;
-    if(amount > accounts[currentIndex].getBalance()) return false;      // ← getter 사용
+    const QList<Account> backup = accounts;
+    accounts[currentIndex].withdraw(amount);
 
-    accounts[currentIndex].withdraw(amount);                            // ← Account 메서드 사용
-
-    if(isMyAccount) {
-        for(auto& a : accounts) {
-            if(a.getBank() == targetBank) {                             // ← getter 사용
-                a.deposit(amount);                                      // ← Account 메서드 사용
-                a.addTransaction("입금", amount, "[My] " + fromBank);
+    if (isMyAccount) {
+        int targetIndex = -1;
+        for (int i = 0; i < accounts.size(); ++i) {
+            if (i == currentIndex) {
+                continue;
+            }
+            if (accounts[i].getAccountNumber() == targetAccountNumber) {
+                targetIndex = i;
                 break;
             }
         }
-        accounts[currentIndex].addTransaction("송금", amount, "[My] " + targetBank);
-    }
-    else {
+
+        if (targetIndex < 0) {
+            accounts = backup;
+            return false;
+        }
+
+        accounts[targetIndex].deposit(amount);
+        accounts[targetIndex].addTransaction("입금", amount, "[My] " + fromBank);
+        accounts[currentIndex].addTransaction("송금", amount, "[My] " + accounts[targetIndex].getBank());
+    } else {
         accounts[currentIndex].addTransaction("송금", amount, targetBank);
     }
+
+    if (!saveCurrentUserAccounts()) {
+        accounts = backup;
+        return false;
+    }
+
     return true;
 }
 
 bool AccountManager::loadFromJsonByUsername(const QString& filePath, const QString& username)
 {
+    const QString selectedAccountNumber =
+        hasValidCurrentAccount() ? accounts[currentIndex].getAccountNumber() : QString();
+
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) return false;
+    if (!file.open(QIODevice::ReadOnly)) {
+        accounts.clear();
+        currentFilePath.clear();
+        currentUsername.clear();
+        currentIndex = 0;
+        return false;
+    }
 
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonArray users = doc.object()["users"].toArray();
+    const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    const QJsonArray users = doc.object()["users"].toArray();
+    file.close();
 
-    accounts.clear();
+    for (const auto& userValue : users) {
+        const QJsonObject user = userValue.toObject();
 
-    for (const auto& userVal : users) {
-        QJsonObject user = userVal.toObject();
+        if (user["username"].toString() != username) {
+            continue;
+        }
 
-        if (user["username"].toString() != username) continue;
+        accounts.clear();
+        const QJsonArray accountArray = user["accounts"].toArray();
+        for (const auto& accountValue : accountArray) {
+            accounts.append(accountFromJson(accountValue.toObject()));
+        }
 
-        QJsonArray accs = user["accounts"].toArray();
-        for (const auto& accVal : accs) {
-            QJsonObject acc = accVal.toObject();
-            const QString bank = acc["bank"].toString();
-            const QString accNum = acc["account_number"].toString();
-            const int balance = acc["balance"].toInt();
+        currentFilePath = filePath;
+        currentUsername = username;
+        currentIndex = 0;
 
-            accounts << Account(bank, accNum, balance);
+        for (int i = 0; i < accounts.size(); ++i) {
+            if (accounts[i].getAccountNumber() == selectedAccountNumber) {
+                currentIndex = i;
+                break;
+            }
         }
         return true;
     }
 
+    accounts.clear();
+    currentFilePath.clear();
+    currentUsername.clear();
+    currentIndex = 0;
     return false;
 }
 
@@ -174,6 +241,7 @@ bool AccountManager::addAccountToUser(const QString& filePath,
         newAccount["bank"] = bank;
         newAccount["balance"] = balance;
         newAccount["balance_pw"] = balancePw;
+        newAccount["history"] = QJsonArray();
 
         accountArray.append(newAccount);
         user["accounts"] = accountArray;
@@ -222,4 +290,53 @@ int AccountManager::getTotalBalance() const
     int total = 0;
     for (const auto& a : accounts) total += a.getBalance();
     return total;
+}
+
+bool AccountManager::hasValidCurrentAccount() const
+{
+    return currentIndex >= 0 && currentIndex < accounts.size();
+}
+
+bool AccountManager::saveCurrentUserAccounts()
+{
+    if (currentFilePath.isEmpty() || currentUsername.isEmpty()) {
+        return false;
+    }
+
+    QFile file(currentFilePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    const QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+
+    QJsonObject root = doc.object();
+    QJsonArray users = root["users"].toArray();
+
+    for (int i = 0; i < users.size(); ++i) {
+        QJsonObject user = users[i].toObject();
+        if (user["username"].toString() != currentUsername) {
+            continue;
+        }
+
+        QJsonArray accountArray;
+        for (const auto& account : accounts) {
+            accountArray.append(accountToJson(account));
+        }
+
+        user["accounts"] = accountArray;
+        users[i] = user;
+        root["users"] = users;
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            return false;
+        }
+
+        file.write(QJsonDocument(root).toJson());
+        file.close();
+        return true;
+    }
+
+    return false;
 }

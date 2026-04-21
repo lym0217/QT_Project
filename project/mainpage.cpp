@@ -19,7 +19,7 @@ MainPage::MainPage(QWidget *parent)
     ui->label_2->setText("T055 BANK");
     ui->label->setText("총 자산 0원");
     ui->label_3->setText("T055 BANK");
-    ui->label_4->setText("대표 계좌 : 0원");
+    ui->current_account->setText("대표 계좌 : 0원");
     ui->home_user_name_label->setText("OOO님");
 
     showHomePage();
@@ -69,7 +69,7 @@ MainPage::MainPage(QWidget *parent)
             font-weight: 700;
             padding: 16px 8px 14px 8px;
         }
-        QLabel#label_4 {
+        QLabel#current_account {
             color: #42657d;
             font-size: 16px;
             font-weight: 600;
@@ -134,22 +134,22 @@ MainPage::MainPage(QWidget *parent)
         QPushButton#add_account_btn:hover {
             background: #23897d;
         }
-        QPushButton#pushButton_2 {
+        QPushButton#deposit_btn {
             background: #1fbf8f;
         }
-        QPushButton#pushButton_2:hover {
+        QPushButton#deposit_btn:hover {
             background: #15ab7f;
         }
-        QPushButton#pushButton_3 {
+        QPushButton#withdraw_btn {
             background: #ff8a5b;
         }
-        QPushButton#pushButton_3:hover {
+        QPushButton#withdraw_btn:hover {
             background: #f07a49;
         }
-        QPushButton#pushButton {
+        QPushButton#transfer_btn {
             background: #4f7cff;
         }
-        QPushButton#pushButton:hover {
+        QPushButton#transfer_btn:hover {
             background: #416de6;
         }
     )");
@@ -250,13 +250,13 @@ void MainPage::refreshAccountTable()
 
     if (currentUsername.isEmpty()) {
         ui->label->setText("총 자산 0원");
-        ui->label_4->setText("대표 계좌 : 0원");
+        ui->current_account->setText("대표 계좌 : 0원");
         return;
     }
 
     if (!manager.loadFromJsonByUsername("users.json", currentUsername)) {
         ui->label->setText("총 자산 0원");
-        ui->label_4->setText("대표 계좌 : 0원");
+        ui->current_account->setText("대표 계좌 : 0원");
         return;
     }
 
@@ -274,9 +274,9 @@ void MainPage::refreshAccountTable()
 
     if (!accounts.isEmpty()) {
         const Account& firstAccount = accounts.first();
-        ui->label_4->setText(firstAccount.getBank() + " : " + formatMoney(firstAccount.getBalance()));
+        ui->current_account->setText(firstAccount.getBank() + " : " + formatMoney(firstAccount.getBalance()));
     } else {
-        ui->label_4->setText("대표 계좌 : 0원");
+        ui->current_account->setText("대표 계좌 : 0원");
     }
 }
 
@@ -339,9 +339,12 @@ void MainPage::on_deposit_btn_clicked()
             QMessageBox::warning(this, "오류", "비밀번호가 일치하지 않습니다.");
             return;
         }
-        manager.deposit(dlg.getAmount());
-        manager.saveToJson("data.json", 1);
+        if (!manager.deposit(dlg.getAmount())) {
+            QMessageBox::warning(this, "오류", "입금 내용을 저장하지 못했습니다.");
+            return;
+        }
         refreshUI();
+        updateDetailHeader();
         updateHistoryTable();
     }
 }
@@ -370,9 +373,12 @@ void MainPage::on_withdraw_btn_clicked()
             QMessageBox::warning(this, "오류", "비밀번호가 일치하지 않습니다.");
             return;
         }
-        manager.withdraw(dlg.getAmount());
-        manager.saveToJson("data.json", 1);
+        if (!manager.withdraw(dlg.getAmount())) {
+            QMessageBox::warning(this, "오류", "출금 내용을 저장하지 못했습니다.");
+            return;
+        }
         refreshUI();
+        updateDetailHeader();
         updateHistoryTable();
     }
 }
@@ -410,10 +416,16 @@ void MainPage::on_trasfer_btn_clicked()
             QMessageBox::warning(this, "오류", "비밀번호가 일치하지 않습니다.");
             return;
         }
-        manager.transfer(amount, targetBank, dlg.isMyAccountTransfer(),
-                         manager.getCurrentAccount().getBank());
-        manager.saveToJson("data.json", 1);
+        if (!manager.transfer(amount,
+                              targetBank,
+                              dlg.getTargetAccountNum(),
+                              dlg.isMyAccountTransfer(),
+                              manager.getCurrentAccount().getBank())) {
+            QMessageBox::warning(this, "오류", "송금 내용을 저장하지 못했습니다.");
+            return;
+        }
         refreshUI();
+        updateDetailHeader();
         updateHistoryTable();
     }
 }
@@ -424,12 +436,12 @@ void MainPage::updateDetailHeader()
     const int currentIndex = manager.getCurrentIndex();
 
     if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
-        ui->label_4->setText("대표 계좌 : 0원");
+        ui->current_account->setText("대표 계좌 : 0원");
         return;
     }
 
     const Account& currentAccount = accounts[currentIndex];
-    ui->label_4->setText(currentAccount.getBank() + " " +
+    ui->current_account->setText(currentAccount.getBank() + " " +
                          currentAccount.getAccountNumber() + " : " +
                          formatMoney(currentAccount.getBalance()));
 }

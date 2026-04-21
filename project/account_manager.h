@@ -14,7 +14,6 @@ public:
     int  getCurrentIndex() const;
     int  getTotalBalance() const;
 
-    bool loadFromJson(const QString& filePath, int userId);  // 추가
     bool loadFromJsonByUsername(const QString& filePath, const QString& username);
     bool addAccountToUser(const QString& filePath,
                           const QString& username,
@@ -26,13 +25,19 @@ public:
 
     bool deposit(int amount);           //입금
     bool withdraw(int amount);          //출금
-    bool transfer(int amount, QString targetBank, bool isMyAccount, QString fromBank);
-                                        //송금
+    bool transfer(int amount,
+                  const QString& targetBank,
+                  const QString& targetAccountNumber,
+                  bool isMyAccount,
+                  const QString& fromBank); //송금
 private:
+    bool hasValidCurrentAccount() const;
+    bool saveCurrentUserAccounts();
+
     QList<Account> accounts;
     int currentIndex;
-    QString currentFilePath;  // saveToJson 편하게 쓰려고
-    int currentUserId;
+    QString currentFilePath;
+    QString currentUsername;
 };
 
 #endif // ACCOUNT_MANAGER_H

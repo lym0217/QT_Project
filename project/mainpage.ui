@@ -21,7 +21,7 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page">
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -164,6 +164,13 @@
             </layout>
            </item>
            <item>
+            <widget class="QLabel" name="current_account">
+             <property name="text">
+              <string>계좌명 : 잔고</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QTableWidget" name="tableWidget_2">
              <column>
               <property name="text">
@@ -193,13 +200,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="current_account">
-             <property name="text">
-              <string>계좌명 : 잔고</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QPushButton" name="deposit_btn">
@@ -216,7 +216,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="trasfer_btn">
+              <widget class="QPushButton" name="transfer_btn">
                <property name="text">
                 <string>송금</string>
                </property>

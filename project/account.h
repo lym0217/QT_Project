@@ -8,10 +8,16 @@
 //거래내역 데이터 정리
 class Transaction {
 public:
-    Transaction(QString type, int amount, QString target, QString note = "")
-        : type(type), amount(amount), target(target), note(note)
+    Transaction(QString type,
+                int amount,
+                QString target,
+                QString note = "",
+                QString datetime = "")
+        : type(type), amount(amount), datetime(datetime), target(target), note(note)
     {
-        datetime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
+        if (this->datetime.isEmpty()) {
+            this->datetime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
+        }
     }
 // 입금, 출금, 송금 보낼 때마다 정리되는 type들
     QString getType()        const { return type; }     // 거래 종류: 입금-출금-송금
@@ -51,12 +57,21 @@ public:
         balance -= amount;          // 출금시 잔액 감소 구현
     }
 
-    void addTransaction(QString type, int amount, QString target, QString note = "")
+    void addTransaction(QString type,
+                        int amount,
+                        QString target,
+                        QString note = "",
+                        QString datetime = "")
     {
-        history.append(Transaction(type, amount, target, note));
+        history.append(Transaction(type, amount, target, note, datetime));
     }
 
     QList<Transaction>& getHistory()
+    {
+        return history;
+    }
+
+    const QList<Transaction>& getHistory() const
     {
         return history;
     }
