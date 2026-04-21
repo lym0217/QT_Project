@@ -24,6 +24,16 @@ LoginPage::LoginPage(QWidget *parent)
     ui->pw_lineEdit->setPlaceholderText("비밀번호를 입력하세요");
     ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
     ui->pw_checkBox->setCursor(Qt::PointingHandCursor);
+    ui->label_2->setFixedWidth(84);
+    ui->label_3->setFixedWidth(84);
+    ui->id_lineEdit->setFixedWidth(220);
+    ui->pw_lineEdit->setFixedWidth(220);
+    ui->pw_checkBox->setFixedSize(24, 24);
+    ui->login_btn->setFixedWidth(328);
+    ui->pushButton->setFixedWidth(328);
+    ui->gridLayout->setAlignment(Qt::AlignHCenter);
+    ui->gridLayout->setHorizontalSpacing(10);
+    ui->gridLayout->setVerticalSpacing(12);
 
     setStyleSheet(R"(
         QWidget#LoginPage {
@@ -88,8 +98,8 @@ LoginPage::LoginPage(QWidget *parent)
             spacing: 0px;
         }
         QCheckBox::indicator {
-            width: 28px;
-            height: 28px;
+            width: 18px;
+            height: 18px;
         }
     )");
 }
