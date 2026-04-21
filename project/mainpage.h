@@ -37,6 +37,8 @@ private slots:
     void on_tableWidget_2_itemChanged(QTableWidgetItem *item);
     void on_delete_account_btn_clicked();
 
+    void on_lineEdit_textChanged(const QString &arg1);
+
 private:
     void refreshAccountTable();
     void refreshTransactionTable();

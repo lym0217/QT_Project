@@ -363,8 +363,11 @@ QStringList MainPage::currentAccountOptions() const
 {
     QStringList options;
     const QList<Account>& accounts = manager.getAccounts();
+    const QString nowAccount = currentAccountNumber(); // 현재 계좌번호
+
 
     for (const Account& account : accounts) {
+        if (account.getAccountNumber() == nowAccount) continue; // 현재 계좌 스킵
         options << (account.getBank() + " : " + account.getAccountNumber());
     }
 
@@ -568,6 +571,26 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
 
     if (!saved) {
         QMessageBox::warning(this, "메모 저장 실패", "메모를 JSON 파일에 저장하지 못했습니다.");
+    }
+}
+
+void MainPage::on_lineEdit_textChanged(const QString &arg1)
+{
+    for (int i = 0; i < ui->tableWidget_2->rowCount(); ++i) {
+        QTableWidgetItem* memoItem = ui->tableWidget_2->item(i, 4);
+
+        if (arg1.isEmpty()) {
+            ui->tableWidget_2->setRowHidden(i, false);
+            continue;
+        }
+
+        if (!memoItem || memoItem->text().isEmpty()) {
+            ui->tableWidget_2->setRowHidden(i, true);
+            continue;
+        }
+
+        bool match = memoItem->text().contains(arg1, Qt::CaseInsensitive);
+        ui->tableWidget_2->setRowHidden(i, !match);
     }
 }
 
