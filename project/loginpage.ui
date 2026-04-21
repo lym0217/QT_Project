@@ -82,14 +82,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2" colspan="2">
+       <item row="3" column="0" colspan="4">
         <widget class="QPushButton" name="pushButton">
          <property name="text">
           <string>Sign Up</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="2" column="0" colspan="4">
         <widget class="QPushButton" name="login_btn">
          <property name="text">
           <string>Sign In</string>
