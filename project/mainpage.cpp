@@ -11,6 +11,37 @@
 #include <QMessageBox>
 #include <QTableWidgetItem>
 
+namespace {
+void showStyledMessageBox(QWidget *parent,
+                          QMessageBox::Icon icon,
+                          const QString &title,
+                          const QString &text)
+{
+    QMessageBox messageBox(parent);
+    messageBox.setWindowTitle(title);
+    messageBox.setText(text);
+    messageBox.setIcon(icon);
+    messageBox.addButton("확인", QMessageBox::AcceptRole);
+    messageBox.setStyleSheet(R"(
+        QMessageBox {
+            background: white;
+        }
+        QPushButton {
+            background: white;
+            color: black;
+            border: 1px solid black;
+            border-radius: 6px;
+            padding: 6px 16px;
+            min-width: 72px;
+        }
+        QPushButton:hover {
+            background: #f3f3f3;
+        }
+    )");
+    messageBox.exec();
+}
+}
+
 MainPage::MainPage(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MainPage)
@@ -222,7 +253,7 @@ void MainPage::on_back_btn_clicked()
 void MainPage::on_add_account_btn_clicked()
 {
     if (currentUsername.isEmpty()) {
-        QMessageBox::warning(this, "오류", "로그인한 사용자 정보가 없습니다.");
+        showStyledMessageBox(this, QMessageBox::Warning, "오류", "로그인한 사용자 정보가 없습니다.");
         return;
     }
 
@@ -241,35 +272,12 @@ void MainPage::on_add_account_btn_clicked()
                                                   message);
 
     if (!success) {
-        QMessageBox::warning(this, "계좌 추가 실패", message);
+        showStyledMessageBox(this, QMessageBox::Warning, "계좌 추가 실패", message);
         return;
     }
 
     refreshAccountTable();
-
-    QMessageBox messageBox(this);
-    messageBox.setWindowTitle("완료");
-    messageBox.setText(message);
-    messageBox.setIcon(QMessageBox::Information);
-    QPushButton *okButton = messageBox.addButton("확인", QMessageBox::AcceptRole);
-    messageBox.setStyleSheet(R"(
-        QMessageBox {
-            background: white;
-        }
-        QPushButton {
-            background: white;
-            color: black;
-            border: 1px solid black;
-            border-radius: 6px;
-            padding: 6px 16px;
-            min-width: 72px;
-        }
-        QPushButton:hover {
-            background: #f3f3f3;
-        }
-    )");
-    messageBox.exec();
-    Q_UNUSED(okButton);
+    showStyledMessageBox(this, QMessageBox::Information, "완료", message);
 }
 
 void MainPage::on_tableWidget_cellDoubleClicked(int row, int column)
@@ -430,7 +438,7 @@ void MainPage::handleTransactionDialog(const QString &actionName,
                                        bool ownAccountTransfer)
 {
     if (currentUsername.isEmpty() || currentAccountNumber().isEmpty()) {
-        QMessageBox::warning(this, "오류", "현재 선택된 계좌가 없습니다.");
+        showStyledMessageBox(this, QMessageBox::Warning, "오류", "현재 선택된 계좌가 없습니다.");
         return;
     }
 
@@ -440,12 +448,12 @@ void MainPage::handleTransactionDialog(const QString &actionName,
     }
 
     if (dialog.amount() <= 0) {
-        QMessageBox::warning(this, "오류", "0원보다 큰 금액을 입력하세요.");
+        showStyledMessageBox(this, QMessageBox::Warning, "오류", "0원보다 큰 금액을 입력하세요.");
         return;
     }
 
     if (dialog.password() <= 0) {
-        QMessageBox::warning(this, "오류", "계좌 비밀번호를 입력하세요.");
+        showStyledMessageBox(this, QMessageBox::Warning, "오류", "계좌 비밀번호를 입력하세요.");
         return;
     }
 
@@ -471,12 +479,12 @@ void MainPage::handleTransactionDialog(const QString &actionName,
                                              message);
     } else if (actionName == "송금") {
         if (targetBank.isEmpty() || targetAccountNumber.isEmpty()) {
-            QMessageBox::warning(this, "오류", "송금할 계좌 정보를 입력하세요.");
+            showStyledMessageBox(this, QMessageBox::Warning, "오류", "송금할 계좌 정보를 입력하세요.");
             return;
         }
 
         if (ownAccountTransfer && targetAccountNumber == accountNumber) {
-            QMessageBox::warning(this, "오류", "현재 계좌와 같은 계좌로는 송금할 수 없습니다.");
+            showStyledMessageBox(this, QMessageBox::Warning, "오류", "현재 계좌와 같은 계좌로는 송금할 수 없습니다.");
             return;
         }
 
@@ -493,7 +501,7 @@ void MainPage::handleTransactionDialog(const QString &actionName,
     }
 
     if (!success) {
-        QMessageBox::warning(this, actionName + " 실패", message);
+        showStyledMessageBox(this, QMessageBox::Warning, actionName + " 실패", message);
         return;
     }
 
@@ -501,7 +509,7 @@ void MainPage::handleTransactionDialog(const QString &actionName,
     refreshTransactionTable();
     updateDetailHeader();
 
-    QMessageBox::information(this, "완료", message);
+    showStyledMessageBox(this, QMessageBox::Information, "완료", message);
 }
 
 void MainPage::refreshTransactionTable()
@@ -570,7 +578,7 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
                                                      item->text().trimmed());
 
     if (!saved) {
-        QMessageBox::warning(this, "메모 저장 실패", "메모를 JSON 파일에 저장하지 못했습니다.");
+        showStyledMessageBox(this, QMessageBox::Warning, "메모 저장 실패", "메모를 JSON 파일에 저장하지 못했습니다.");
     }
 }
 
@@ -597,7 +605,7 @@ void MainPage::on_lineEdit_textChanged(const QString &arg1)
 void MainPage::on_delete_account_btn_clicked()
 {
     if (currentUsername.isEmpty()) {
-        QMessageBox::warning(this, "오류", "현재 로그인한 계정이 없습니다.");
+        showStyledMessageBox(this, QMessageBox::Warning, "오류", "현재 로그인한 계정이 없습니다.");
         return;
     }
 
@@ -614,11 +622,11 @@ void MainPage::on_delete_account_btn_clicked()
                                                      message);
 
     if (!deleted) {
-        QMessageBox::warning(this, "계정 삭제 실패", message);
+        showStyledMessageBox(this, QMessageBox::Warning, "계정 삭제 실패", message);
         return;
     }
 
     accountDeleted = true;
-    QMessageBox::information(this, "완료", message);
+    showStyledMessageBox(this, QMessageBox::Information, "완료", message);
     on_logout_btn_clicked();
 }
