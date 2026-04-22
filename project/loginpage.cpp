@@ -6,34 +6,40 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QCryptographicHash>
+#include <QCheckBox>
 #include <QMessageBox>
+#include <QPushButton>
 
 LoginPage::LoginPage(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::LoginPage)
+    , m_ui(new Ui::LoginPage)
 {
-    ui->setupUi(this);
-    ui->pw_checkBox->setIcon(QIcon(":/resources/hidden1.png"));
+    m_ui->setupUi(this);
+    m_ui->pw_checkBox->setIcon(QIcon(":/resources/hidden1.png"));
 
     setWindowTitle("간편 입출금 계좌 관리");
 
-    ui->label->setText("T055");
-    ui->label_2->setText("아이디");
-    ui->label_3->setText("비밀번호");
-    ui->id_lineEdit->setPlaceholderText("아이디를 입력하세요");
-    ui->pw_lineEdit->setPlaceholderText("비밀번호를 입력하세요");
-    ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
-    ui->pw_checkBox->setCursor(Qt::PointingHandCursor);
-    ui->label_2->setFixedWidth(84);
-    ui->label_3->setFixedWidth(84);
-    ui->id_lineEdit->setFixedWidth(220);
-    ui->pw_lineEdit->setFixedWidth(220);
-    ui->pw_checkBox->setFixedSize(24, 24);
-    ui->login_btn->setFixedWidth(328);
-    ui->pushButton->setFixedWidth(328);
-    ui->gridLayout->setAlignment(Qt::AlignHCenter);
-    ui->gridLayout->setHorizontalSpacing(10);
-    ui->gridLayout->setVerticalSpacing(12);
+    m_ui->label->setText("T055");
+    m_ui->label_2->setText("아이디");
+    m_ui->label_3->setText("비밀번호");
+    m_ui->id_lineEdit->setPlaceholderText("아이디를 입력하세요");
+    m_ui->pw_lineEdit->setPlaceholderText("비밀번호를 입력하세요");
+    m_ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
+    m_ui->pw_checkBox->setCursor(Qt::PointingHandCursor);
+    m_ui->label_2->setFixedWidth(84);
+    m_ui->label_3->setFixedWidth(84);
+    m_ui->id_lineEdit->setFixedWidth(220);
+    m_ui->pw_lineEdit->setFixedWidth(220);
+    m_ui->pw_checkBox->setFixedSize(24, 24);
+    m_ui->login_btn->setFixedWidth(328);
+    m_ui->pushButton->setFixedWidth(328);
+    m_ui->gridLayout->setAlignment(Qt::AlignHCenter);
+    m_ui->gridLayout->setHorizontalSpacing(10);
+    m_ui->gridLayout->setVerticalSpacing(12);
+
+    connect(m_ui->login_btn, &QPushButton::clicked, this, &LoginPage::onLoginButtonClicked);
+    connect(m_ui->pw_checkBox, &QCheckBox::checkStateChanged, this, &LoginPage::onPasswordVisibilityChanged);
+    connect(m_ui->pushButton, &QPushButton::clicked, this, &LoginPage::onSignupButtonClicked);
 
     setStyleSheet(R"(
         QWidget#LoginPage {
@@ -106,24 +112,24 @@ LoginPage::LoginPage(QWidget *parent)
 
 LoginPage::~LoginPage()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void LoginPage::clearInputs()
 {
-    ui->id_lineEdit->clear();
-    ui->pw_lineEdit->clear();
-    ui->pw_checkBox->setChecked(false);
-    ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
-    ui->id_lineEdit->setFocus();
+    m_ui->id_lineEdit->clear();
+    m_ui->pw_lineEdit->clear();
+    m_ui->pw_checkBox->setChecked(false);
+    m_ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
+    m_ui->id_lineEdit->setFocus();
 }
 
-void LoginPage::on_login_btn_clicked()
+void LoginPage::onLoginButtonClicked()
 {
-    QString id = ui->id_lineEdit->text();
-    QString pw = ui->pw_lineEdit->text();
+    const QString id = m_ui->id_lineEdit->text();
+    const QString password = m_ui->pw_lineEdit->text();
 
-    if(id.isEmpty() || pw.isEmpty())
+    if (id.isEmpty() || password.isEmpty())
     {
         QMessageBox::warning(this, "오류", "아이디와 비밀번호를 입력하세요.");
         return;
@@ -143,21 +149,20 @@ void LoginPage::on_login_btn_clicked()
     file.close();
 
     // 입력 비밀번호 해시
-    QString hashedPw = QCryptographicHash::hash(
-                           pw.toUtf8(),
+    const QString hashedPassword = QCryptographicHash::hash(
+                           password.toUtf8(),
                            QCryptographicHash::Sha256
                            ).toHex();
 
     // 사용자 검사
-    for(auto u : users)
+    for (const auto& userValue : users)
     {
-        QJsonObject obj = u.toObject();
+        const QJsonObject userObject = userValue.toObject();
 
-        if(obj["username"].toString() == id &&
-            obj["password"].toString() == hashedPw)
+        if (userObject["username"].toString() == id &&
+            userObject["password"].toString() == hashedPassword)
         {
-            // 로그인 성공
-            emit loginSuccess(obj["name"].toString(), obj["username"].toString());
+            emit loginSuccess(userObject["name"].toString(), userObject["username"].toString());
             return;
         }
     }
@@ -165,23 +170,23 @@ void LoginPage::on_login_btn_clicked()
     // 실패
     QMessageBox::warning(this, "로그인 실패", "아이디 또는 비밀번호가 틀렸습니다.");
 }
-void LoginPage::on_pw_checkBox_checkStateChanged(const Qt::CheckState &arg1)
+void LoginPage::onPasswordVisibilityChanged(const Qt::CheckState &state)
 {
-    if(arg1 == Qt::Checked)
+    if (state == Qt::Checked)
     {
-        ui->pw_lineEdit->setEchoMode(QLineEdit::Normal);
+        m_ui->pw_lineEdit->setEchoMode(QLineEdit::Normal);
     }
     else
     {
-        ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
+        m_ui->pw_lineEdit->setEchoMode(QLineEdit::Password);
     }
 }
 
 
-void LoginPage::on_pushButton_clicked()
+void LoginPage::onSignupButtonClicked()
 {
     SignUp dlg(this);
-    if(dlg.exec() == QDialog::Accepted)
+    if (dlg.exec() == QDialog::Accepted)
     {
         QMessageBox::information(this, "완료", "회원가입이 완료되었습니다.");
     }

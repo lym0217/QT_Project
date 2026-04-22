@@ -12,12 +12,11 @@ TransactionDialog::TransactionDialog(const QString &actionName,
                                      const QString &currentAccountText,
                                      QWidget *parent)
     : QDialog(parent)
-    , actionName(actionName)
-    , accountValueLabel(new QLabel(currentAccountText, this))
-    , amountEdit(new QLineEdit(this))
-    , passwordEdit(new QLineEdit(this))
-    , confirmButton(new QPushButton("확인", this))
-    , cancelButton(new QPushButton("취소", this))
+    , m_accountValueLabel(new QLabel(currentAccountText, this))
+    , m_amountEdit(new QLineEdit(this))
+    , m_passwordEdit(new QLineEdit(this))
+    , m_confirmButton(new QPushButton("확인", this))
+    , m_cancelButton(new QPushButton("취소", this))
 {
     setWindowTitle(actionName);
     resize(380, 320);
@@ -29,46 +28,46 @@ TransactionDialog::TransactionDialog(const QString &actionName,
     currentAccountLabel->setAlignment(Qt::AlignCenter);
     currentAccountLabel->setObjectName("titleLabel");
 
-    accountValueLabel->setAlignment(Qt::AlignCenter);
-    accountValueLabel->setObjectName("accountValueLabel");
+    m_accountValueLabel->setAlignment(Qt::AlignCenter);
+    m_accountValueLabel->setObjectName("accountValueLabel");
 
-    amountEdit->setPlaceholderText("금액을 입력하세요");
-    amountEdit->setValidator(new QIntValidator(0, 100000000, this));
+    m_amountEdit->setPlaceholderText("금액을 입력하세요");
+    m_amountEdit->setValidator(new QIntValidator(0, 100000000, this));
 
-    passwordEdit->setPlaceholderText("계좌 비밀번호를 입력하세요");
-    passwordEdit->setEchoMode(QLineEdit::Password);
-    passwordEdit->setValidator(new QIntValidator(0, 999999, this));
+    m_passwordEdit->setPlaceholderText("계좌 비밀번호를 입력하세요");
+    m_passwordEdit->setEchoMode(QLineEdit::Password);
+    m_passwordEdit->setValidator(new QIntValidator(0, 999999, this));
 
     auto *amountLayout = new QHBoxLayout();
     auto *amountLabel = new QLabel("금액", this);
     amountLabel->setFixedWidth(52);
     amountLayout->addWidget(amountLabel);
-    amountLayout->addWidget(amountEdit);
+    amountLayout->addWidget(m_amountEdit);
 
     auto *passwordLayout = new QHBoxLayout();
     auto *passwordLabel = new QLabel("비밀번호", this);
     passwordLabel->setFixedWidth(52);
     passwordLayout->addWidget(passwordLabel);
-    passwordLayout->addWidget(passwordEdit);
+    passwordLayout->addWidget(m_passwordEdit);
 
     auto *limitLabel = new QLabel("이체금액한도 1억", this);
     limitLabel->setAlignment(Qt::AlignCenter);
     limitLabel->setObjectName("limitLabel");
 
     auto *buttonLayout = new QHBoxLayout();
-    confirmButton->setObjectName("confirmButton");
-    cancelButton->setObjectName("cancelButton");
-    buttonLayout->addWidget(confirmButton);
-    buttonLayout->addWidget(cancelButton);
+    m_confirmButton->setObjectName("confirmButton");
+    m_cancelButton->setObjectName("cancelButton");
+    buttonLayout->addWidget(m_confirmButton);
+    buttonLayout->addWidget(m_cancelButton);
 
-    connect(confirmButton, &QPushButton::clicked, this, &QDialog::accept);
-    connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
+    connect(m_confirmButton, &QPushButton::clicked, this, &QDialog::accept);
+    connect(m_cancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(brandLabel, 0, Qt::AlignLeft);
     mainLayout->addSpacing(6);
     mainLayout->addWidget(currentAccountLabel);
-    mainLayout->addWidget(accountValueLabel);
+    mainLayout->addWidget(m_accountValueLabel);
     mainLayout->addSpacing(8);
     mainLayout->addLayout(amountLayout);
     mainLayout->addLayout(passwordLayout);
@@ -145,10 +144,10 @@ TransactionDialog::TransactionDialog(const QString &actionName,
 
 int TransactionDialog::amount() const
 {
-    return amountEdit->text().toInt();
+    return m_amountEdit->text().toInt();
 }
 
 int TransactionDialog::password() const
 {
-    return passwordEdit->text().toInt();
+    return m_passwordEdit->text().toInt();
 }

@@ -1,90 +1,118 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
+
 #include <QString>
 #include <QList>
 #include <QDateTime>
 #include <QTableWidgetItem>
 
-//거래내역 데이터 정리
-class Transaction {
+/**
+ * @brief Transaction 클래스는 한 건의 거래내역 정보를 저장한다.
+ *
+ * 멤버 변수
+ * - m_type: 거래 구분(입금, 출금, 송금)
+ * - m_amount: 거래 금액
+ * - m_datetime: 거래가 발생한 날짜와 시간
+ * - m_target: 상대 이름 또는 계좌 정보
+ * - m_note: 사용자가 수정할 수 있는 메모
+ *
+ * 주요 함수
+ * - getType(), getDatetime(), getTarget(), getNote(), getAmount(): 거래 정보 조회
+ * - setNote(): 메모 수정
+ */
+class Transaction
+{
 public:
     Transaction(QString type, int amount, QString target, QString note = "")
-        : type(type), amount(amount), target(target), note(note)
+        : m_type(type), m_amount(amount), m_target(target), m_note(note)
     {
-        datetime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
+        m_datetime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
     }
+
     Transaction(QString type, int amount, QString target, QString note, QString datetime)
-        : type(type), amount(amount), datetime(datetime), target(target), note(note) {}
-// 입금, 출금, 송금 보낼 때마다 정리되는 type들
-    QString getType()        const { return type; }     // 거래 종류: 입금-출금-송금
-    QString getDatetime()    const { return datetime; } // 거래가 이뤄지는 시간
-    QString getTarget()      const { return target; }   // 상대방 이름 + 계좌
-    QString getNote()        const { return note; }     // 메모 칸
-    void setNote(QString n)  { note = n; }              // 메모만 수정할 수 있게 따로 구현
-    int getAmount()          const { return amount; }   // 거래 금액
+        : m_type(type), m_amount(amount), m_datetime(datetime), m_target(target), m_note(note) {}
+
+    QString getType() const { return m_type; }
+    QString getDatetime() const { return m_datetime; }
+    QString getTarget() const { return m_target; }
+    QString getNote() const { return m_note; }
+    void setNote(const QString &note) { m_note = note; }
+    int getAmount() const { return m_amount; }
 
 private:
-    QString type;
-    int     amount;
-    QString datetime;
-    QString target;
-    QString note;
+    QString m_type;
+    int m_amount;
+    QString m_datetime;
+    QString m_target;
+    QString m_note;
 };
 
-// 계좌 금액, 기록
-class Account {
+/**
+ * @brief Account 클래스는 한 개의 계좌 정보와 거래내역 목록을 저장한다.
+ *
+ * 멤버 변수
+ * - m_bank: 은행명
+ * - m_accountNumber: 계좌번호
+ * - m_balance: 현재 잔액
+ * - m_history: 해당 계좌의 거래내역 목록
+ *
+ * 주요 함수
+ * - deposit(), withdraw(): 잔액 증감
+ * - addTransaction(): 거래내역 추가
+ * - getHistory(): 거래내역 목록 조회
+ */
+class Account
+{
 public:
-    Account(QString bank, QString accountNumber, int balance = 0)           // bank: 은행이름, balance: 초기 잔액
-        : bank(bank), accountNumber(accountNumber), balance(balance) {}
+    Account(QString bank, QString accountNumber, int balance = 0)
+        : m_bank(bank), m_accountNumber(accountNumber), m_balance(balance) {}
 
-    QString getBank()          const { return bank; }
-    QString getAccountNumber() const { return accountNumber; }
-    int     getBalance()       const { return balance; }
-
-    void deposit(int amount)
-    {
-        balance += amount;          // 입금시 잔액 증가 구현
-    }
-    void withdraw(int amount)
-    {
-        balance -= amount;          // 출금시 잔액 감소 구현
-    }
+    QString getBank() const { return m_bank; }
+    QString getAccountNumber() const { return m_accountNumber; }
+    int getBalance() const { return m_balance; }
 
     void addTransaction(QString type, int amount, QString target, QString note = "")
     {
-        history.append(Transaction(type, amount, target, note));
+        m_history.append(Transaction(type, amount, target, note));
     }
+
     void addTransaction(QString type, int amount, QString target, QString note, QString datetime)
     {
-        history.append(Transaction(type, amount, target, note, datetime));
+        m_history.append(Transaction(type, amount, target, note, datetime));
     }
 
     QList<Transaction>& getHistory()
     {
-        return history;
+        return m_history;
     }
+
     const QList<Transaction>& getHistory() const
     {
-        return history;
+        return m_history;
     }
 
 private:
-    QString            bank;                // 은행이름
-    QString            accountNumber;       // 계좌 번호
-    int                balance;             // 현재 잔액
-    QList<Transaction> history;             // 거래 내역 리스트
+    QString m_bank;
+    QString m_accountNumber;
+    int m_balance;
+    QList<Transaction> m_history;
 };
 
-// 금액정렬 시 ,로 인한 정렬 오류를 해결
-class NumericTableWidgetItem : public QTableWidgetItem {
+/**
+ * @brief NumericTableWidgetItem 클래스는 금액 문자열을 숫자 기준으로 정렬하기 위한 아이템이다.
+ */
+class NumericTableWidgetItem : public QTableWidgetItem
+{
 public:
-    NumericTableWidgetItem(QString text) : QTableWidgetItem(text) {}
+    explicit NumericTableWidgetItem(QString text) : QTableWidgetItem(text) {}
+
     bool operator<(const QTableWidgetItem& other) const override
     {
-        QString a = text(), b = other.text();
-        a.remove(",").remove("원");
-        b.remove(",").remove("원");
-        return a.toLongLong() < b.toLongLong();
+        QString leftText = text();
+        QString rightText = other.text();
+        leftText.remove(",").remove("원");
+        rightText.remove(",").remove("원");
+        return leftText.toLongLong() < rightText.toLongLong();
     }
 };
 

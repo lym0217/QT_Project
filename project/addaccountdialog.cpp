@@ -14,10 +14,10 @@
 
 AddAccountDialog::AddAccountDialog(QWidget *parent)
     : QDialog(parent)
-    , bankComboBox(new QComboBox(this))
-    , accountNumberEdit(new QLineEdit(this))
-    , balanceEdit(new QLineEdit(this))
-    , balancePasswordEdit(new QLineEdit(this))
+    , m_bankComboBox(new QComboBox(this))
+    , m_accountNumberEdit(new QLineEdit(this))
+    , m_balanceEdit(new QLineEdit(this))
+    , m_balancePasswordEdit(new QLineEdit(this))
 {
     setWindowTitle("계좌 추가");
     resize(360, 260);
@@ -37,26 +37,26 @@ AddAccountDialog::AddAccountDialog(QWidget *parent)
         "두리은행",
         "혼자은행"
     };
-    auto *bankListView = new QListView(bankComboBox);
+    auto *bankListView = new QListView(m_bankComboBox);
     bankListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     bankListView->setUniformItemSizes(true);
     bankListView->setSpacing(0);
-    bankComboBox->setView(bankListView);
-    bankComboBox->addItems(bankList);
+    m_bankComboBox->setView(bankListView);
+    m_bankComboBox->addItems(bankList);
 
-    accountNumberEdit->setPlaceholderText("예: 100-200-3000");
-    balanceEdit->setText("0");
-    balanceEdit->setReadOnly(true);
-    balancePasswordEdit->setPlaceholderText("예: 123456");
-    balanceEdit->setValidator(new QIntValidator(0, 1000000000, this));
-    balancePasswordEdit->setValidator(new QIntValidator(0, 999999, this));
-    balancePasswordEdit->setEchoMode(QLineEdit::Password);
+    m_accountNumberEdit->setPlaceholderText("예: 100-200-3000");
+    m_balanceEdit->setText("0");
+    m_balanceEdit->setReadOnly(true);
+    m_balancePasswordEdit->setPlaceholderText("예: 123456");
+    m_balanceEdit->setValidator(new QIntValidator(0, 1000000000, this));
+    m_balancePasswordEdit->setValidator(new QIntValidator(0, 999999, this));
+    m_balancePasswordEdit->setEchoMode(QLineEdit::Password);
 
     auto *formLayout = new QFormLayout();
-    formLayout->addRow("은행명", bankComboBox);
-    formLayout->addRow("계좌번호", accountNumberEdit);
-    formLayout->addRow("잔액", balanceEdit);
-    formLayout->addRow("계좌 비밀번호", balancePasswordEdit);
+    formLayout->addRow("은행명", m_bankComboBox);
+    formLayout->addRow("계좌번호", m_accountNumberEdit);
+    formLayout->addRow("잔액", m_balanceEdit);
+    formLayout->addRow("계좌 비밀번호", m_balancePasswordEdit);
 
     auto *okButton = new QPushButton("추가", this);
     auto *cancelButton = new QPushButton("취소", this);
@@ -129,27 +129,27 @@ AddAccountDialog::AddAccountDialog(QWidget *parent)
 
 QString AddAccountDialog::bank() const
 {
-    return bankComboBox->currentText().trimmed();
+    return m_bankComboBox->currentText().trimmed();
 }
 
 QString AddAccountDialog::accountNumber() const
 {
-    return accountNumberEdit->text().trimmed();
+    return m_accountNumberEdit->text().trimmed();
 }
 
 int AddAccountDialog::balance() const
 {
-    return balanceEdit->text().toInt();
+    return m_balanceEdit->text().toInt();
 }
 
 int AddAccountDialog::balancePassword() const
 {
-    return balancePasswordEdit->text().toInt();
+    return m_balancePasswordEdit->text().toInt();
 }
 
 void AddAccountDialog::validateAndAccept()
 {
-    if (accountNumber().isEmpty() || balancePasswordEdit->text().trimmed().isEmpty()) {
+    if (accountNumber().isEmpty() || m_balancePasswordEdit->text().trimmed().isEmpty()) {
         QMessageBox::warning(this, "입력 오류", "모든 계좌 정보를 입력해주세요.");
         return;
     }

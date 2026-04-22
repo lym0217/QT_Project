@@ -8,7 +8,10 @@
 #include <QAbstractItemView>
 #include <QHeaderView>
 #include <QLocale>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QTableWidget>
 #include <QTableWidgetItem>
 
 namespace {
@@ -44,40 +47,51 @@ void showStyledMessageBox(QWidget *parent,
 
 MainPage::MainPage(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::MainPage)
+    , m_ui(new Ui::MainPage)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
     setWindowTitle("계좌 관리 대시보드");
 
-    ui->label_2->setText("T055 BANK");
-    ui->label->setText("총 자산 0원");
-    ui->label_3->setText("T055 BANK");
-    ui->label_4->setText("대표 계좌 : 0원");
-    ui->home_user_name_label->setText("OOO님");
+    m_ui->label_2->setText("T055 BANK");
+    m_ui->label->setText("총 자산 0원");
+    m_ui->label_3->setText("T055 BANK");
+    m_ui->label_4->setText("대표 계좌 : 0원");
+    m_ui->home_user_name_label->setText("OOO님");
 
     showHomePage();
 
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableWidget->verticalHeader()->setDefaultSectionSize(36);
-    ui->tableWidget->verticalHeader()->setMinimumSectionSize(36);
-    ui->tableWidget_2->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableWidget_2->verticalHeader()->setDefaultSectionSize(36);
-    ui->tableWidget_2->verticalHeader()->setMinimumSectionSize(36);
+    m_ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    m_ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    m_ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
+    m_ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    m_ui->tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_ui->tableWidget->verticalHeader()->setDefaultSectionSize(36);
+    m_ui->tableWidget->verticalHeader()->setMinimumSectionSize(36);
+    m_ui->tableWidget_2->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    m_ui->tableWidget_2->verticalHeader()->setDefaultSectionSize(36);
+    m_ui->tableWidget_2->verticalHeader()->setMinimumSectionSize(36);
 
-    ui->tableWidget->setAlternatingRowColors(true);
-    ui->tableWidget_2->setAlternatingRowColors(true);
-    ui->tableWidget->setShowGrid(false);
-    ui->tableWidget_2->setShowGrid(false);
-    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tableWidget_2->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
-    ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_ui->tableWidget->setAlternatingRowColors(true);
+    m_ui->tableWidget_2->setAlternatingRowColors(true);
+    m_ui->tableWidget->setShowGrid(false);
+    m_ui->tableWidget_2->setShowGrid(false);
+    m_ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_ui->tableWidget_2->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+    m_ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    connect(m_ui->logout_btn, &QPushButton::clicked, this, &MainPage::onLogoutButtonClicked);
+    connect(m_ui->back_btn, &QPushButton::clicked, this, &MainPage::onBackButtonClicked);
+    connect(m_ui->add_account_btn, &QPushButton::clicked, this, &MainPage::onAddAccountButtonClicked);
+    connect(m_ui->delete_account_btn, &QPushButton::clicked, this, &MainPage::onDeleteAccountButtonClicked);
+    connect(m_ui->pushButton_2, &QPushButton::clicked, this, &MainPage::onDepositButtonClicked);
+    connect(m_ui->pushButton_3, &QPushButton::clicked, this, &MainPage::onWithdrawButtonClicked);
+    connect(m_ui->pushButton, &QPushButton::clicked, this, &MainPage::onTransferButtonClicked);
+    connect(m_ui->lineEdit, &QLineEdit::textChanged, this, &MainPage::onMemoFilterTextChanged);
+    connect(m_ui->tableWidget, &QTableWidget::cellDoubleClicked, this, &MainPage::onAccountTableCellDoubleClicked);
+    connect(m_ui->tableWidget_2, &QTableWidget::itemChanged, this, &MainPage::onTransactionTableItemChanged);
 
     setStyleSheet(R"(
         QWidget#MainPage {
@@ -204,55 +218,54 @@ MainPage::MainPage(QWidget *parent)
 
 MainPage::~MainPage()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void MainPage::setUserName(const QString &userName)
 {
     const QString displayName = userName.isEmpty() ? "OOO님" : userName + "님";
-    ui->home_user_name_label->setText(displayName);
+    m_ui->home_user_name_label->setText(displayName);
 }
 
 void MainPage::setCurrentUser(const QString &userName, const QString &username)
 {
-    currentUsername = username;
-    currentOwnerName = userName;
+    m_currentUsername = username;
+    m_currentOwnerName = userName;
     setUserName(userName);
     refreshAccountTable();
 }
 
 void MainPage::showHomePage()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    m_ui->stackedWidget->setCurrentIndex(0);
 }
 
 void MainPage::showDetailPage()
 {
     updateDetailHeader();
     refreshTransactionTable();
-    ui->stackedWidget->setCurrentIndex(1);
+    m_ui->stackedWidget->setCurrentIndex(1);
 }
 
-void MainPage::on_logout_btn_clicked()
+void MainPage::onLogoutButtonClicked()
 {
-    currentUsername.clear();
-    currentOwnerName.clear();
-    manager.getAccounts().clear();
-    ui->home_user_name_label->setText("OOO님");
-    accountDeleted = false;
+    m_currentUsername.clear();
+    m_currentOwnerName.clear();
+    m_accountManager.getAccounts().clear();
+    m_ui->home_user_name_label->setText("OOO님");
     refreshAccountTable();
     showHomePage();
     emit logoutRequested();
 }
 
-void MainPage::on_back_btn_clicked()
+void MainPage::onBackButtonClicked()
 {
     showHomePage();
 }
 
-void MainPage::on_add_account_btn_clicked()
+void MainPage::onAddAccountButtonClicked()
 {
-    if (currentUsername.isEmpty()) {
+    if (m_currentUsername.isEmpty()) {
         showStyledMessageBox(this, QMessageBox::Warning, "오류", "로그인한 사용자 정보가 없습니다.");
         return;
     }
@@ -263,8 +276,8 @@ void MainPage::on_add_account_btn_clicked()
     }
 
     QString message;
-    const bool success = manager.addAccountToUser("users.json",
-                                                  currentUsername,
+    const bool success = m_accountManager.addAccountToUser("users.json",
+                                                  m_currentUsername,
                                                   dialog.bank(),
                                                   dialog.accountNumber(),
                                                   dialog.balance(),
@@ -280,56 +293,56 @@ void MainPage::on_add_account_btn_clicked()
     showStyledMessageBox(this, QMessageBox::Information, "완료", message);
 }
 
-void MainPage::on_tableWidget_cellDoubleClicked(int row, int column)
+void MainPage::onAccountTableCellDoubleClicked(int row, int column)
 {
     if (column != 0) {
         return;
     }
 
-    const QList<Account>& accounts = manager.getAccounts();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
     if (row < 0 || row >= accounts.size()) {
         return;
     }
 
-    manager.setCurrentIndex(row);
+    m_accountManager.setCurrentIndex(row);
     showDetailPage();
 }
 
 void MainPage::refreshAccountTable()
 {
-    ui->tableWidget->setRowCount(0);
+    m_ui->tableWidget->setRowCount(0);
 
-    if (currentUsername.isEmpty()) {
-        ui->label->setText("총 자산 0원");
-        ui->label_4->setText("대표 계좌 : 0원");
-        ui->tableWidget_2->setRowCount(0);
+    if (m_currentUsername.isEmpty()) {
+        m_ui->label->setText("총 자산 0원");
+        m_ui->label_4->setText("대표 계좌 : 0원");
+        m_ui->tableWidget_2->setRowCount(0);
         return;
     }
 
-    if (!manager.loadFromJsonByUsername("users.json", currentUsername)) {
-        ui->label->setText("총 자산 0원");
-        ui->label_4->setText("대표 계좌 : 0원");
-        ui->tableWidget_2->setRowCount(0);
+    if (!m_accountManager.loadFromJsonByUsername("users.json", m_currentUsername)) {
+        m_ui->label->setText("총 자산 0원");
+        m_ui->label_4->setText("대표 계좌 : 0원");
+        m_ui->tableWidget_2->setRowCount(0);
         return;
     }
 
-    const QList<Account>& accounts = manager.getAccounts();
-    ui->tableWidget->setRowCount(accounts.size());
+    const QList<Account>& accounts = m_accountManager.getAccounts();
+    m_ui->tableWidget->setRowCount(accounts.size());
 
     for (int row = 0; row < accounts.size(); ++row) {
         const Account& account = accounts[row];
-        ui->tableWidget->setItem(row, 0, new QTableWidgetItem(account.getBank()));
-        ui->tableWidget->setItem(row, 1, new QTableWidgetItem(account.getAccountNumber()));
-        ui->tableWidget->setItem(row, 2, new NumericTableWidgetItem(formatMoney(account.getBalance())));
+        m_ui->tableWidget->setItem(row, 0, new QTableWidgetItem(account.getBank()));
+        m_ui->tableWidget->setItem(row, 1, new QTableWidgetItem(account.getAccountNumber()));
+        m_ui->tableWidget->setItem(row, 2, new NumericTableWidgetItem(formatMoney(account.getBalance())));
     }
 
-    ui->label->setText("총 자산 " + formatMoney(manager.getTotalBalance()));
+    m_ui->label->setText("총 자산 " + formatMoney(m_accountManager.getTotalBalance()));
 
     if (!accounts.isEmpty()) {
         const Account& firstAccount = accounts.first();
-        ui->label_4->setText(firstAccount.getBank() + " : " + formatMoney(firstAccount.getBalance()));
+        m_ui->label_4->setText(firstAccount.getBank() + " : " + formatMoney(firstAccount.getBalance()));
     } else {
-        ui->label_4->setText("대표 계좌 : 0원");
+        m_ui->label_4->setText("대표 계좌 : 0원");
     }
 }
 
@@ -340,24 +353,24 @@ QString MainPage::formatMoney(int amount) const
 
 void MainPage::updateDetailHeader()
 {
-    const QList<Account>& accounts = manager.getAccounts();
-    const int currentIndex = manager.getCurrentIndex();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
+    const int currentIndex = m_accountManager.getCurrentIndex();
 
     if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
-        ui->label_4->setText("대표 계좌 : 0원");
+        m_ui->label_4->setText("대표 계좌 : 0원");
         return;
     }
 
     const Account& currentAccount = accounts[currentIndex];
-    ui->label_4->setText(currentAccount.getBank() + " " +
+    m_ui->label_4->setText(currentAccount.getBank() + " " +
                          currentAccount.getAccountNumber() + " : " +
                          formatMoney(currentAccount.getBalance()));
 }
 
 QString MainPage::currentAccountSummary() const
 {
-    const QList<Account>& accounts = manager.getAccounts();
-    const int currentIndex = manager.getCurrentIndex();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
+    const int currentIndex = m_accountManager.getCurrentIndex();
 
     if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
         return "계좌 없음 : 0원";
@@ -370,7 +383,7 @@ QString MainPage::currentAccountSummary() const
 QStringList MainPage::currentAccountOptions() const
 {
     QStringList options;
-    const QList<Account>& accounts = manager.getAccounts();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
     const QString nowAccount = currentAccountNumber(); // 현재 계좌번호
 
 
@@ -384,8 +397,8 @@ QStringList MainPage::currentAccountOptions() const
 
 QString MainPage::currentAccountNumber() const
 {
-    const QList<Account>& accounts = manager.getAccounts();
-    const int currentIndex = manager.getCurrentIndex();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
+    const int currentIndex = m_accountManager.getCurrentIndex();
 
     if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
         return QString();
@@ -394,17 +407,17 @@ QString MainPage::currentAccountNumber() const
     return accounts[currentIndex].getAccountNumber();
 }
 
-void MainPage::on_pushButton_2_clicked()
+void MainPage::onDepositButtonClicked()
 {
     handleTransactionDialog("입금");
 }
 
-void MainPage::on_pushButton_3_clicked()
+void MainPage::onWithdrawButtonClicked()
 {
     handleTransactionDialog("출금");
 }
 
-void MainPage::on_pushButton_clicked()
+void MainPage::onTransferButtonClicked()
 {
     TransferDialog transferDialog(currentAccountOptions(), this);
     if (transferDialog.exec() != QDialog::Accepted) {
@@ -437,7 +450,7 @@ void MainPage::handleTransactionDialog(const QString &actionName,
                                        const QString &targetAccountNumber,
                                        bool ownAccountTransfer)
 {
-    if (currentUsername.isEmpty() || currentAccountNumber().isEmpty()) {
+    if (m_currentUsername.isEmpty() || currentAccountNumber().isEmpty()) {
         showStyledMessageBox(this, QMessageBox::Warning, "오류", "현재 선택된 계좌가 없습니다.");
         return;
     }
@@ -462,17 +475,17 @@ void MainPage::handleTransactionDialog(const QString &actionName,
     const QString accountNumber = currentAccountNumber();
 
     if (actionName == "입금") {
-        success = manager.depositToAccount("users.json",
-                                          currentUsername,
-                                          currentOwnerName,
+        success = m_accountManager.depositToAccount("users.json",
+                                          m_currentUsername,
+                                          m_currentOwnerName,
                                           accountNumber,
                                           dialog.amount(),
                                           dialog.password(),
                                           message);
     } else if (actionName == "출금") {
-        success = manager.withdrawFromAccount("users.json",
-                                             currentUsername,
-                                             currentOwnerName,
+        success = m_accountManager.withdrawFromAccount("users.json",
+                                             m_currentUsername,
+                                             m_currentOwnerName,
                                              accountNumber,
                                              dialog.amount(),
                                              dialog.password(),
@@ -488,9 +501,9 @@ void MainPage::handleTransactionDialog(const QString &actionName,
             return;
         }
 
-        success = manager.transferBetweenAccounts("users.json",
-                                                  currentUsername,
-                                                  currentOwnerName,
+        success = m_accountManager.transferBetweenAccounts("users.json",
+                                                  m_currentUsername,
+                                                  m_currentOwnerName,
                                                   accountNumber,
                                                   targetBank,
                                                   targetAccountNumber,
@@ -514,18 +527,18 @@ void MainPage::handleTransactionDialog(const QString &actionName,
 
 void MainPage::refreshTransactionTable()
 {
-    updatingTransactionTable = true;
-    ui->tableWidget_2->setRowCount(0);
+    m_isUpdatingTransactionTable = true;
+    m_ui->tableWidget_2->setRowCount(0);
 
-    const QList<Account>& accounts = manager.getAccounts();
-    const int currentIndex = manager.getCurrentIndex();
+    const QList<Account>& accounts = m_accountManager.getAccounts();
+    const int currentIndex = m_accountManager.getCurrentIndex();
     if (accounts.isEmpty() || currentIndex < 0 || currentIndex >= accounts.size()) {
-        updatingTransactionTable = false;
+        m_isUpdatingTransactionTable = false;
         return;
     }
 
     const QList<Transaction>& history = accounts[currentIndex].getHistory();
-    ui->tableWidget_2->setRowCount(history.size());
+    m_ui->tableWidget_2->setRowCount(history.size());
 
     for (int row = 0; row < history.size(); ++row) {
         const Transaction& transaction = history[row];
@@ -541,19 +554,19 @@ void MainPage::refreshTransactionTable()
         targetItem->setFlags(targetItem->flags() & ~Qt::ItemIsEditable);
         amountItem->setFlags(amountItem->flags() & ~Qt::ItemIsEditable);
 
-        ui->tableWidget_2->setItem(row, 0, dateTimeItem);
-        ui->tableWidget_2->setItem(row, 1, typeItem);
-        ui->tableWidget_2->setItem(row, 2, targetItem);
-        ui->tableWidget_2->setItem(row, 3, amountItem);
-        ui->tableWidget_2->setItem(row, 4, noteItem);
+        m_ui->tableWidget_2->setItem(row, 0, dateTimeItem);
+        m_ui->tableWidget_2->setItem(row, 1, typeItem);
+        m_ui->tableWidget_2->setItem(row, 2, targetItem);
+        m_ui->tableWidget_2->setItem(row, 3, amountItem);
+        m_ui->tableWidget_2->setItem(row, 4, noteItem);
     }
 
-    updatingTransactionTable = false;
+    m_isUpdatingTransactionTable = false;
 }
 
-void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
+void MainPage::onTransactionTableItemChanged(QTableWidgetItem *item)
 {
-    if (updatingTransactionTable || item == nullptr || item->column() != 4) {
+    if (m_isUpdatingTransactionTable || item == nullptr || item->column() != 4) {
         return;
     }
 
@@ -563,16 +576,16 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
     }
 
     const int historyIndex = item->data(Qt::UserRole).toInt();
-    const int currentIndex = manager.getCurrentIndex();
-    if (currentIndex >= 0 && currentIndex < manager.getAccounts().size()) {
-        QList<Transaction> &history = manager.getAccounts()[currentIndex].getHistory();
+    const int currentIndex = m_accountManager.getCurrentIndex();
+    if (currentIndex >= 0 && currentIndex < m_accountManager.getAccounts().size()) {
+        QList<Transaction> &history = m_accountManager.getAccounts()[currentIndex].getHistory();
         if (historyIndex >= 0 && historyIndex < history.size()) {
             history[historyIndex].setNote(item->text().trimmed());
         }
     }
 
-    const bool saved = manager.updateTransactionNote("users.json",
-                                                     currentUsername,
+    const bool saved = m_accountManager.updateTransactionNote("users.json",
+                                                     m_currentUsername,
                                                      accountNumber,
                                                      historyIndex,
                                                      item->text().trimmed());
@@ -582,29 +595,29 @@ void MainPage::on_tableWidget_2_itemChanged(QTableWidgetItem *item)
     }
 }
 
-void MainPage::on_lineEdit_textChanged(const QString &arg1)
+void MainPage::onMemoFilterTextChanged(const QString &text)
 {
-    for (int i = 0; i < ui->tableWidget_2->rowCount(); ++i) {
-        QTableWidgetItem* memoItem = ui->tableWidget_2->item(i, 4);
+    for (int i = 0; i < m_ui->tableWidget_2->rowCount(); ++i) {
+        QTableWidgetItem* memoItem = m_ui->tableWidget_2->item(i, 4);
 
-        if (arg1.isEmpty()) {
-            ui->tableWidget_2->setRowHidden(i, false);
+        if (text.isEmpty()) {
+            m_ui->tableWidget_2->setRowHidden(i, false);
             continue;
         }
 
         if (!memoItem || memoItem->text().isEmpty()) {
-            ui->tableWidget_2->setRowHidden(i, true);
+            m_ui->tableWidget_2->setRowHidden(i, true);
             continue;
         }
 
-        bool match = memoItem->text().contains(arg1, Qt::CaseInsensitive);
-        ui->tableWidget_2->setRowHidden(i, !match);
+        const bool match = memoItem->text().contains(text, Qt::CaseInsensitive);
+        m_ui->tableWidget_2->setRowHidden(i, !match);
     }
 }
 
-void MainPage::on_delete_account_btn_clicked()
+void MainPage::onDeleteAccountButtonClicked()
 {
-    if (currentUsername.isEmpty()) {
+    if (m_currentUsername.isEmpty()) {
         showStyledMessageBox(this, QMessageBox::Warning, "오류", "현재 로그인한 계정이 없습니다.");
         return;
     }
@@ -615,8 +628,8 @@ void MainPage::on_delete_account_btn_clicked()
     }
 
     QString message;
-    const bool deleted = manager.deleteUserByContact("users.json",
-                                                     currentUsername,
+    const bool deleted = m_accountManager.deleteUserByContact("users.json",
+                                                     m_currentUsername,
                                                      dialog.phone(),
                                                      dialog.email(),
                                                      message);
@@ -626,7 +639,6 @@ void MainPage::on_delete_account_btn_clicked()
         return;
     }
 
-    accountDeleted = true;
     showStyledMessageBox(this, QMessageBox::Information, "완료", message);
-    on_logout_btn_clicked();
+    onLogoutButtonClicked();
 }

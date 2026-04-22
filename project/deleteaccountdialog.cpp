@@ -9,8 +9,8 @@
 
 DeleteAccountDialog::DeleteAccountDialog(QWidget *parent)
     : QDialog(parent)
-    , phoneEdit(new QLineEdit(this))
-    , emailEdit(new QLineEdit(this))
+    , m_phoneEdit(new QLineEdit(this))
+    , m_emailEdit(new QLineEdit(this))
 {
     setWindowTitle("계정 삭제");
     resize(360, 220);
@@ -22,8 +22,8 @@ DeleteAccountDialog::DeleteAccountDialog(QWidget *parent)
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setObjectName("titleLabel");
 
-    phoneEdit->setPlaceholderText("전화번호");
-    emailEdit->setPlaceholderText("이메일");
+    m_phoneEdit->setPlaceholderText("전화번호");
+    m_emailEdit->setPlaceholderText("이메일");
 
     auto *okButton = new QPushButton("확인", this);
     auto *cancelButton = new QPushButton("취소", this);
@@ -42,8 +42,8 @@ DeleteAccountDialog::DeleteAccountDialog(QWidget *parent)
     mainLayout->addSpacing(6);
     mainLayout->addWidget(titleLabel);
     mainLayout->addSpacing(10);
-    mainLayout->addWidget(phoneEdit);
-    mainLayout->addWidget(emailEdit);
+    mainLayout->addWidget(m_phoneEdit);
+    mainLayout->addWidget(m_emailEdit);
     mainLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 
@@ -90,12 +90,12 @@ DeleteAccountDialog::DeleteAccountDialog(QWidget *parent)
 
 QString DeleteAccountDialog::phone() const
 {
-    return phoneEdit->text().trimmed();
+    return m_phoneEdit->text().trimmed();
 }
 
 QString DeleteAccountDialog::email() const
 {
-    return emailEdit->text().trimmed();
+    return m_emailEdit->text().trimmed();
 }
 
 void DeleteAccountDialog::validateAndAccept()

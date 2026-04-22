@@ -11,29 +11,29 @@ SignupManager::SignupManager(QString filePath)
 }
 
 // 중복 체크
-bool SignupManager::isUsernameAvailable(QString username)
+bool SignupManager::isUsernameAvailable(const QString& username)
 {
     QJsonArray users;
 
     if(!loadJson(users))
         return false;
 
-    for(auto u : users)
+    for (const auto& userValue : users)
     {
-        QJsonObject obj = u.toObject();
-        if(obj["username"].toString() == username)
+        const QJsonObject userObject = userValue.toObject();
+        if (userObject["username"].toString() == username)
             return false;
     }
     return true;
 }
 
 // 회원가입
-bool SignupManager::registerUser(QString username,
-                                 QString password,
-                                 QString confirmPassword,
-                                 QString name,
-                                 QString phone,
-                                 QString email,
+bool SignupManager::registerUser(const QString& username,
+                                 const QString& password,
+                                 const QString& confirmPassword,
+                                 const QString& name,
+                                 const QString& phone,
+                                 const QString& email,
                                  QString& message)
 {
     QJsonArray users;
@@ -45,32 +45,32 @@ bool SignupManager::registerUser(QString username,
     }
 
     // 입력 검사
-    if(username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
+    if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
         || name.isEmpty() || phone.isEmpty() || email.isEmpty())
     {
         message = "모든 항목을 입력해주세요.";
         return false;
     }
 
-    if(password != confirmPassword)
+    if (password != confirmPassword)
     {
         message = "비밀번호가 일치하지 않습니다.";
         return false;
     }
 
-    if(!isValidPhone(phone))
+    if (!isValidPhone(phone))
     {
         message = "전화번호 형식 오류";
         return false;
     }
 
-    if(!isValidEmail(email))
+    if (!isValidEmail(email))
     {
         message = "이메일 형식 오류";
         return false;
     }
 
-    if(!isUsernameAvailable(username))
+    if (!isUsernameAvailable(username))
     {
         message = "이미 사용중인 아이디입니다.";
         return false;
@@ -146,14 +146,14 @@ bool SignupManager::saveJson(const QJsonArray& users)
 }
 
 // 전화번호 검사
-bool SignupManager::isValidPhone(QString phone)
+bool SignupManager::isValidPhone(const QString& phone)
 {
     QRegularExpression regex("^010-\\d{4}-\\d{4}$");
     return regex.match(phone).hasMatch();
 }
 
 // 이메일 검사
-bool SignupManager::isValidEmail(QString email)
+bool SignupManager::isValidEmail(const QString& email)
 {
     QRegularExpression regex("^[\\w\\.]+@[\\w\\.]+$");
     return regex.match(email).hasMatch();
