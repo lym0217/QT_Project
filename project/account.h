@@ -57,7 +57,6 @@ private:
  * - m_history: 해당 계좌의 거래내역 목록
  *
  * 주요 함수
- * - deposit(), withdraw(): 잔액 증감
  * - addTransaction(): 거래내역 추가
  * - getHistory(): 거래내역 목록 조회
  */
