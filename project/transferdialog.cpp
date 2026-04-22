@@ -10,11 +10,11 @@
 
 TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
     : QDialog(parent)
-    , myAccountRadio(new QRadioButton("<내 계좌로 보내기>", this))
-    , otherAccountRadio(new QRadioButton("<다른 계좌로 보내기>", this))
-    , myAccountComboBox(new QComboBox(this))
-    , otherBankComboBox(new QComboBox(this))
-    , otherAccountEdit(new QLineEdit(this))
+    , m_myAccountRadio(new QRadioButton("<내 계좌로 보내기>", this))
+    , m_otherAccountRadio(new QRadioButton("<다른 계좌로 보내기>", this))
+    , m_myAccountComboBox(new QComboBox(this))
+    , m_otherBankComboBox(new QComboBox(this))
+    , m_otherAccountEdit(new QLineEdit(this))
 {
     setWindowTitle("송금");
     resize(430, 320);
@@ -26,8 +26,8 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setObjectName("titleLabel");
 
-    myAccountComboBox->addItems(myAccounts);
-    myAccountComboBox->setEnabled(!myAccounts.isEmpty());
+    m_myAccountComboBox->addItems(myAccounts);
+    m_myAccountComboBox->setEnabled(!myAccounts.isEmpty());
 
     const QStringList bankList = {
         "NH농혁은행",
@@ -41,12 +41,12 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
         "두리은행",
         "혼자은행"
     };
-    otherBankComboBox->addItems(bankList);
-    otherAccountEdit->setPlaceholderText("계좌번호를 입력하세요");
+    m_otherBankComboBox->addItems(bankList);
+    m_otherAccountEdit->setPlaceholderText("계좌번호를 입력하세요");
 
     auto *otherAccountLayout = new QHBoxLayout();
-    otherAccountLayout->addWidget(otherBankComboBox);
-    otherAccountLayout->addWidget(otherAccountEdit);
+    otherAccountLayout->addWidget(m_otherBankComboBox);
+    otherAccountLayout->addWidget(m_otherAccountEdit);
 
     auto *okButton = new QPushButton("확인", this);
     auto *cancelButton = new QPushButton("취소", this);
@@ -55,10 +55,10 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
 
     connect(okButton, &QPushButton::clicked, this, &QDialog::accept);
     connect(cancelButton, &QPushButton::clicked, this, &QDialog::reject);
-    connect(myAccountRadio, &QRadioButton::toggled, this, [this]() { updateMode(); });
-    connect(otherAccountRadio, &QRadioButton::toggled, this, [this]() { updateMode(); });
+    connect(m_myAccountRadio, &QRadioButton::toggled, this, [this]() { updateMode(); });
+    connect(m_otherAccountRadio, &QRadioButton::toggled, this, [this]() { updateMode(); });
 
-    myAccountRadio->setChecked(true);
+    m_myAccountRadio->setChecked(true);
     updateMode();
 
     auto *buttonLayout = new QHBoxLayout();
@@ -70,10 +70,10 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
     mainLayout->addSpacing(6);
     mainLayout->addWidget(titleLabel);
     mainLayout->addSpacing(10);
-    mainLayout->addWidget(myAccountRadio);
-    mainLayout->addWidget(myAccountComboBox);
+    mainLayout->addWidget(m_myAccountRadio);
+    mainLayout->addWidget(m_myAccountComboBox);
     mainLayout->addSpacing(8);
-    mainLayout->addWidget(otherAccountRadio);
+    mainLayout->addWidget(m_otherAccountRadio);
     mainLayout->addLayout(otherAccountLayout);
     mainLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
@@ -137,28 +137,28 @@ TransferDialog::TransferDialog(const QStringList &myAccounts, QWidget *parent)
 
 void TransferDialog::updateMode()
 {
-    const bool useMyAccount = myAccountRadio->isChecked();
-    myAccountComboBox->setEnabled(useMyAccount);
-    otherBankComboBox->setEnabled(!useMyAccount);
-    otherAccountEdit->setEnabled(!useMyAccount);
+    const bool useMyAccount = m_myAccountRadio->isChecked();
+    m_myAccountComboBox->setEnabled(useMyAccount);
+    m_otherBankComboBox->setEnabled(!useMyAccount);
+    m_otherAccountEdit->setEnabled(!useMyAccount);
 }
 
 bool TransferDialog::isMyAccountTransfer() const
 {
-    return myAccountRadio->isChecked();
+    return m_myAccountRadio->isChecked();
 }
 
 QString TransferDialog::selectedMyAccountText() const
 {
-    return myAccountComboBox->currentText();
+    return m_myAccountComboBox->currentText();
 }
 
 QString TransferDialog::targetBank() const
 {
-    return otherBankComboBox->currentText();
+    return m_otherBankComboBox->currentText();
 }
 
 QString TransferDialog::targetAccountNumber() const
 {
-    return otherAccountEdit->text().trimmed();
+    return m_otherAccountEdit->text().trimmed();
 }

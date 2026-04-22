@@ -5,28 +5,27 @@ MainWindow::MainWindow(QWidget *parent)
 {
     resize(526, 574);
 
-    stack = new QStackedWidget(this);
+    m_stack = new QStackedWidget(this);
 
-    loginPage = new LoginPage();
-    mainPage = new MainPage();
+    m_loginPage = new LoginPage();
+    m_mainPage = new MainPage();
 
-    stack->addWidget(loginPage);  // index 0
-    stack->addWidget(mainPage);   // index 1
+    m_stack->addWidget(m_loginPage);
+    m_stack->addWidget(m_mainPage);
 
-    setCentralWidget(stack);
+    setCentralWidget(m_stack);
 
-    // 로그인 성공 시 페이지 전환
-    connect(loginPage, &LoginPage::loginSuccess, this, [=](const QString &userName, const QString &username) {
-        mainPage->setCurrentUser(userName, username);
-        mainPage->showHomePage();
+    connect(m_loginPage, &LoginPage::loginSuccess, this, [=](const QString &userName, const QString &username) {
+        m_mainPage->setCurrentUser(userName, username);
+        m_mainPage->showHomePage();
         resize(650, 552);
-        stack->setCurrentIndex(1);
+        m_stack->setCurrentIndex(1);
     });
 
-    connect(mainPage, &MainPage::logoutRequested, this, [=]() {
-        loginPage->clearInputs();
+    connect(m_mainPage, &MainPage::logoutRequested, this, [=]() {
+        m_loginPage->clearInputs();
         resize(526, 574);
-        stack->setCurrentIndex(0);
+        m_stack->setCurrentIndex(0);
     });
 }
 

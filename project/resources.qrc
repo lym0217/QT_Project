@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>resources/eye.png</file>
-        <file>resources/hidden.png</file>
         <file>resources/hidden1.png</file>
     </qresource>
 </RCC>
